@@ -52,3 +52,12 @@ export function noteNameToPitchClass(name: string): PitchClass {
 export function noteIdToPitchClass(noteId: NoteId): PitchClass {
   return noteNameToPitchClass(noteId)
 }
+
+const NOTE_IDS_BY_PITCH_CLASS: readonly NoteId[][] = ALL_PITCH_CLASSES.map((pc) =>
+  ALL_NOTE_IDS.filter((id) => noteIdToPitchClass(id) === pc),
+)
+
+/** All NoteId spellings for a pitch class — one for naturals, two (sharp + flat) for accidentals. */
+export function noteIdsForPitchClass(pc: PitchClass): readonly NoteId[] {
+  return NOTE_IDS_BY_PITCH_CLASS[((pc % 12) + 12) % 12]
+}

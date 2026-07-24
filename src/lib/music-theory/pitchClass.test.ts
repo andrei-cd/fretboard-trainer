@@ -4,6 +4,7 @@ import {
   ALL_NOTE_IDS,
   DEFAULT_NOTE_IDS,
   NATURAL_NOTE_IDS,
+  noteIdsForPitchClass,
   noteIdToPitchClass,
   noteNameToPitchClass,
   pitchClassToLabel,
@@ -66,5 +67,19 @@ describe('note id groupings', () => {
     expect(DEFAULT_NOTE_IDS.length).toBe(12)
     expect(DEFAULT_NOTE_IDS).not.toContain('Db')
     expect(DEFAULT_NOTE_IDS).not.toContain('Gb')
+  })
+})
+
+describe('noteIdsForPitchClass', () => {
+  it('returns a single note id for naturals', () => {
+    expect(noteIdsForPitchClass(noteNameToPitchClass('C'))).toEqual(['C'])
+  })
+
+  it('returns both spellings for accidentals', () => {
+    expect(noteIdsForPitchClass(noteNameToPitchClass('F#'))).toEqual(['F#', 'Gb'])
+  })
+
+  it('normalizes out-of-range pitch classes', () => {
+    expect(noteIdsForPitchClass(13)).toEqual(['C#', 'Db'])
   })
 })
