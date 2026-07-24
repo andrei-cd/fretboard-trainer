@@ -1,6 +1,13 @@
 import { create } from 'zustand'
 import type { RoundState, SessionConfig } from '../types'
-import { DEFAULT_FRET_RANGE, DEFAULT_NOTE_IDS, STRING_NAMES, pickRandomRound, pickWeightedRound } from '../lib/music-theory'
+import {
+  DEFAULT_FRET_RANGE,
+  DEFAULT_NOTE_IDS,
+  STRING_NAMES,
+  listReachablePairs,
+  pickRandomRound,
+  pickWeightedRound,
+} from '../lib/music-theory'
 import { useStatsStore } from './statsStore'
 
 interface SessionStore {
@@ -42,7 +49,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
             selectedNotes,
             fretRange,
             round.previousPitchClass,
-            useStatsStore.getState().getWeights(selectedNotes),
+            useStatsStore.getState().getWeights(listReachablePairs(selectedStrings, selectedNotes, fretRange)),
           )
         : pickRandomRound(selectedStrings, selectedNotes, fretRange, round.previousPitchClass)
 

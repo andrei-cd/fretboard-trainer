@@ -47,7 +47,7 @@ export function MicPracticeView() {
     const validMidiNotes = midiNotesForNote(current.stringName, current.pitchClass, fretRange)
     if (validMidiNotes.includes(confirmedMidiNote)) {
       const responseTimeMs = roundStartedAt ? Date.now() - roundStartedAt : 0
-      recordSample(current.noteId, responseTimeMs)
+      recordSample(current.stringName, current.noteId, responseTimeMs)
       nextRound()
       return
     }

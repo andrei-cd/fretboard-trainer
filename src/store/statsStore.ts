@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import type { AdaptiveStatsMap, NoteId, NoteWeights } from '../types'
+import type { AdaptiveStatsMap, NoteId, PairWeights, RoundPick, StringName } from '../types'
+import { makeStatsKey } from '../lib/music-theory'
 import {
   computeWeights,
   loadAdaptiveStats,
@@ -10,16 +11,17 @@ import {
 
 interface StatsStore {
   stats: AdaptiveStatsMap
-  recordSample: (noteId: NoteId, responseTimeMs: number) => void
+  recordSample: (stringName: StringName, noteId: NoteId, responseTimeMs: number) => void
   resetStats: () => void
-  getWeights: (noteIds: readonly NoteId[]) => NoteWeights
+  getWeights: (pairs: readonly RoundPick[]) => PairWeights
 }
 
 export const useStatsStore = create<StatsStore>((set, get) => ({
   stats: loadAdaptiveStats(),
 
-  recordSample: (noteId, responseTimeMs) => {
-    const next = recordSamplePure(get().stats, noteId, responseTimeMs)
+  recordSample: (stringName, noteId, responseTimeMs) => {
+    const key = makeStatsKey(stringName, noteId)
+    const next = recordSamplePure(get().stats, key, responseTimeMs)
     saveAdaptiveStats(next)
     set({ stats: next })
   },
@@ -29,5 +31,5 @@ export const useStatsStore = create<StatsStore>((set, get) => ({
     set({ stats: {} })
   },
 
-  getWeights: (noteIds) => computeWeights(get().stats, noteIds),
+  getWeights: (pairs) => computeWeights(get().stats, pairs.map((p) => makeStatsKey(p.stringName, p.noteId))),
 }))

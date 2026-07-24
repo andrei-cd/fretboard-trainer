@@ -1,19 +1,10 @@
-import type { FretRange, NoteId, NoteWeights, PitchClass, RoundPick, StringName } from '../../types'
+import type { FretRange, NoteId, PairWeights, PitchClass, RoundPick, StringName } from '../../types'
 import { isNoteOnString } from './fretboard'
 import { noteIdToPitchClass } from './pitchClass'
+import { makeStatsKey } from './statsKey'
 
 function pickRandomFrom<T>(items: readonly T[]): T {
   return items[Math.floor(Math.random() * items.length)]
-}
-
-function pickWeightedFrom(items: readonly NoteId[], weights: NoteWeights): NoteId {
-  const total = items.reduce((sum, item) => sum + (weights[item] ?? 1), 0)
-  let roll = Math.random() * total
-  for (const item of items) {
-    roll -= weights[item] ?? 1
-    if (roll <= 0) return item
-  }
-  return items[items.length - 1]
 }
 
 /** Note ids from `noteIds` that are actually playable on at least one of `strings` within `range`. */
@@ -32,22 +23,19 @@ function stringsForNoteId(strings: StringName[], noteId: NoteId, range: FretRang
  * enharmonic spellings — e.g. after F#, Gb is also blocked. Falls back to the full candidate
  * set if that would eliminate every option (only one sound is reachable at all).
  */
-function excludingPreviousPitch(candidates: NoteId[], previousPitchClass: PitchClass | null): NoteId[] {
+function excludingPreviousPitch<T extends { pitchClass: PitchClass }>(
+  candidates: T[],
+  previousPitchClass: PitchClass | null,
+): T[] {
   if (candidates.length <= 1 || previousPitchClass === null) return candidates
-  const filtered = candidates.filter((id) => noteIdToPitchClass(id) !== previousPitchClass)
+  const filtered = candidates.filter((c) => c.pitchClass !== previousPitchClass)
   return filtered.length > 0 ? filtered : candidates
 }
 
-function assertReachable(reachable: NoteId[]): void {
+function assertReachable(reachable: readonly unknown[]): void {
   if (reachable.length === 0) {
     throw new Error('No eligible notes are reachable on the selected strings within the fret range')
   }
-}
-
-function buildPick(strings: StringName[], noteId: NoteId, range: FretRange): RoundPick {
-  const pitchClass = noteIdToPitchClass(noteId)
-  const stringName = pickRandomFrom(stringsForNoteId(strings, noteId, range))
-  return { stringName, noteId, pitchClass }
 }
 
 /** Uniform-random pick of a (string, note) round, never repeating the previous note's sound back-to-back. */
@@ -59,20 +47,54 @@ export function pickRandomRound(
 ): RoundPick {
   const reachable = reachableNoteIds(strings, noteIds, range)
   assertReachable(reachable)
-  const candidates = excludingPreviousPitch(reachable, previousPitchClass)
-  return buildPick(strings, pickRandomFrom(candidates), range)
+  const candidates = excludingPreviousPitch(
+    reachable.map((noteId) => ({ noteId, pitchClass: noteIdToPitchClass(noteId) })),
+    previousPitchClass,
+  )
+  const { noteId, pitchClass } = pickRandomFrom(candidates)
+  const stringName = pickRandomFrom(stringsForNoteId(strings, noteId, range))
+  return { stringName, noteId, pitchClass }
 }
 
-/** Weighted pick of a (string, note) round; higher weight = more likely to be picked. */
+/** Every (string, note) pair actually playable, given the current selection and fret range. */
+export function listReachablePairs(strings: StringName[], noteIds: NoteId[], range: FretRange): RoundPick[] {
+  const pairs: RoundPick[] = []
+  for (const noteId of noteIds) {
+    const pitchClass = noteIdToPitchClass(noteId)
+    for (const stringName of strings) {
+      if (isNoteOnString(stringName, pitchClass, range)) {
+        pairs.push({ stringName, noteId, pitchClass })
+      }
+    }
+  }
+  return pairs
+}
+
+function pickWeightedPairFrom(pairs: readonly RoundPick[], weights: PairWeights): RoundPick {
+  const weightOf = (pair: RoundPick) => weights[makeStatsKey(pair.stringName, pair.noteId)] ?? 1
+  const total = pairs.reduce((sum, pair) => sum + weightOf(pair), 0)
+  let roll = Math.random() * total
+  for (const pair of pairs) {
+    roll -= weightOf(pair)
+    if (roll <= 0) return pair
+  }
+  return pairs[pairs.length - 1]
+}
+
+/**
+ * Weighted pick of a (string, note) round, weighted per exact (string, note) pair so
+ * practice can target a specific weak spot (e.g. "G on the D string") rather than just
+ * a weak note in general. Higher weight = more likely to be picked.
+ */
 export function pickWeightedRound(
   strings: StringName[],
   noteIds: NoteId[],
   range: FretRange,
   previousPitchClass: PitchClass | null,
-  weights: NoteWeights,
+  weights: PairWeights,
 ): RoundPick {
-  const reachable = reachableNoteIds(strings, noteIds, range)
-  assertReachable(reachable)
-  const candidates = excludingPreviousPitch(reachable, previousPitchClass)
-  return buildPick(strings, pickWeightedFrom(candidates, weights), range)
+  const pairs = listReachablePairs(strings, noteIds, range)
+  assertReachable(pairs)
+  const candidates = excludingPreviousPitch(pairs, previousPitchClass)
+  return pickWeightedPairFrom(candidates, weights)
 }

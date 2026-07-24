@@ -61,8 +61,11 @@ export interface AdaptiveStatsEntry {
   sampleCount: number
 }
 
-/** Partial: most notes won't have samples recorded yet. */
-export type AdaptiveStatsMap = Partial<Record<NoteId, AdaptiveStatsEntry>>
+/** Compound key identifying one (string, note) practice pair, e.g. "D:F#". */
+export type StatsKey = `${StringName}:${NoteId}`
 
-/** Partial: unweighted notes fall back to a default weight (see computeWeights). */
-export type NoteWeights = Partial<Record<NoteId, number>>
+/** Partial: most (string, note) pairs won't have samples recorded yet. */
+export type AdaptiveStatsMap = Partial<Record<StatsKey, AdaptiveStatsEntry>>
+
+/** Partial: unweighted pairs fall back to a default weight (see computeWeights). */
+export type PairWeights = Partial<Record<StatsKey, number>>

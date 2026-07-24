@@ -10,6 +10,14 @@
   --danger: #d64545;
   --warning: #b8790a;
   --radius: 10px;
+  /* Sequential heatmap ramp (fast -> slow). Light mode: near-zero recedes toward the
+     light surface, high magnitude goes dark. */
+  --heat-0: #cde2fb;
+  --heat-1: #86b6ef;
+  --heat-2: #3987e5;
+  --heat-3: #1c5cab;
+  --heat-4: #0d366b;
+  --heat-none: #ececef;
   color-scheme: light;
 }
 
@@ -25,6 +33,14 @@
     --success: #3fbf72;
     --danger: #e46a6a;
     --warning: #e0a636;
+    /* Anchor flips in dark mode: near-zero recedes toward the dark surface (dark step),
+       high magnitude pops bright against it (light step) — same ramp, reversed. */
+    --heat-0: #0d366b;
+    --heat-1: #1c5cab;
+    --heat-2: #3987e5;
+    --heat-3: #86b6ef;
+    --heat-4: #cde2fb;
+    --heat-none: #2a2b30;
     color-scheme: dark;
   }
 }

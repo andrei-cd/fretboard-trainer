@@ -37,14 +37,14 @@ describe('sessionStore', () => {
   })
 
   it('uses weighted selection in adaptive mode', () => {
-    // Three eligible notes so the no-repeat rule doesn't force a strict 50/50 alternation.
+    // Three eligible notes on a single string so the no-repeat rule doesn't force a strict 50/50 alternation.
     useStatsStore.setState({
       stats: {
-        C: { avgResponseTimeMs: 5000, sampleCount: 10 },
-        'C#': { avgResponseTimeMs: 300, sampleCount: 10 },
+        'E:C': { avgResponseTimeMs: 5000, sampleCount: 10 },
+        'E:C#': { avgResponseTimeMs: 300, sampleCount: 10 },
       },
     })
-    useSessionStore.getState().setConfig({ mode: 'adaptive', selectedNotes: ['C', 'C#', 'D'] })
+    useSessionStore.getState().setConfig({ mode: 'adaptive', selectedStrings: ['E'], selectedNotes: ['C', 'C#', 'D'] })
     const counts = { C: 0, 'C#': 0, D: 0 } as Record<string, number>
     for (let i = 0; i < 600; i++) {
       useSessionStore.getState().nextRound()
@@ -52,6 +52,25 @@ describe('sessionStore', () => {
     }
     expect(counts.C).toBeGreaterThan(counts['C#'])
     expect(counts.C).toBeGreaterThan(counts.D)
+  })
+
+  it('weights the same note differently on different strings in adaptive mode', () => {
+    // G is recorded as slow on the D string but fast on the E string.
+    useStatsStore.setState({
+      stats: {
+        'D:G': { avgResponseTimeMs: 6000, sampleCount: 10 },
+        'E:G': { avgResponseTimeMs: 500, sampleCount: 10 },
+      },
+    })
+    useSessionStore.getState().setConfig({ mode: 'adaptive', selectedStrings: ['E', 'D'], selectedNotes: ['G', 'C'] })
+    const counts = { 'D:G': 0, 'E:G': 0 } as Record<string, number>
+    for (let i = 0; i < 600; i++) {
+      useSessionStore.getState().nextRound()
+      const { current } = useSessionStore.getState().round
+      const key = `${current!.stringName}:${current!.noteId}`
+      if (key in counts) counts[key]++
+    }
+    expect(counts['D:G']).toBeGreaterThan(counts['E:G'])
   })
 
   it('tracks F# and Gb as independently selectable notes that still block each other back-to-back', () => {
