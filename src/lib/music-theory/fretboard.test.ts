@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_FRET_RANGE, fretsForNote, isNoteOnString, noteAtFret } from './fretboard'
+import {
+  DEFAULT_FRET_RANGE,
+  formatStringName,
+  fretsForNote,
+  isNoteOnString,
+  midiNoteAtFret,
+  midiNotesForNote,
+  noteAtFret,
+} from './fretboard'
 import { noteNameToPitchClass } from './pitchClass'
 
 describe('noteAtFret', () => {
@@ -38,5 +46,38 @@ describe('isNoteOnString', () => {
 
   it('is false when out of range', () => {
     expect(isNoteOnString('E', noteNameToPitchClass('E'), { min: 1, max: 11 })).toBe(false)
+  })
+})
+
+describe('midiNoteAtFret', () => {
+  it('matches known MIDI note numbers', () => {
+    expect(midiNoteAtFret('E', 0)).toBe(40) // low E2
+    expect(midiNoteAtFret('A', 0)).toBe(45) // A2
+    expect(midiNoteAtFret('e', 0)).toBe(64) // high E4
+    expect(midiNoteAtFret('E', 5)).toBe(45) // low E string, fret 5 = A2, same octave as open A string
+  })
+})
+
+describe('midiNotesForNote', () => {
+  it('returns distinct octaves for a note that recurs on the same string', () => {
+    // Low E string: open (fret 0) and fret 12 are both E, an octave apart.
+    const midiNotes = midiNotesForNote('E', noteNameToPitchClass('E'), DEFAULT_FRET_RANGE)
+    expect(midiNotes).toEqual([40, 52])
+  })
+
+  it('distinguishes the same pitch class on different strings by octave', () => {
+    // The G on the low E string (fret 3, G2) is a different octave than the open G string (G3).
+    const onLowE = midiNotesForNote('E', noteNameToPitchClass('G'), DEFAULT_FRET_RANGE)
+    const onG = midiNotesForNote('G', noteNameToPitchClass('G'), DEFAULT_FRET_RANGE)
+    expect(onLowE).toEqual([43])
+    expect(onG).toEqual([55, 67]) // open G3, and fret 12 = G4
+    expect(onLowE[0]).not.toBe(onG[0])
+  })
+})
+
+describe('formatStringName', () => {
+  it('renders the high e string distinctly from the low E string', () => {
+    expect(formatStringName('e')).toBe('high e')
+    expect(formatStringName('E')).toBe('E')
   })
 })
