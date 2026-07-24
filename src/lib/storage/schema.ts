@@ -11,6 +11,8 @@ export interface PersistedSchemaV1 {
   feedbackMessagesEnabled?: boolean
   /** Undefined on data saved before this preference existed — treat as 'medium'. */
   micSensitivity?: MicSensitivity
+  /** Undefined on data saved before this preference existed — treat as enabled (default true). */
+  mergeAccidentalSpellingsEnabled?: boolean
   lastSessionConfig?: SessionConfig
 }
 

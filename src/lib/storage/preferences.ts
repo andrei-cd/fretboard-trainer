@@ -24,3 +24,11 @@ export function loadMicSensitivity(): MicSensitivity {
 export function saveMicSensitivity(sensitivity: MicSensitivity): void {
   saveState({ ...loadState(), micSensitivity: sensitivity })
 }
+
+export function loadMergeAccidentalSpellingsEnabled(): boolean {
+  return loadState().mergeAccidentalSpellingsEnabled ?? true
+}
+
+export function saveMergeAccidentalSpellingsEnabled(enabled: boolean): void {
+  saveState({ ...loadState(), mergeAccidentalSpellingsEnabled: enabled })
+}

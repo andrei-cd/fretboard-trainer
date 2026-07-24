@@ -38,12 +38,30 @@ function assertReachable(reachable: readonly unknown[]): void {
   }
 }
 
+/**
+ * Groups candidates that share a key into one pool slot instead of one each. Selecting both
+ * spellings of an accidental (e.g. C# and Db) would otherwise give that pitch roughly twice
+ * the pick chance of a natural note, since it occupies two separate NoteIds for one sound.
+ * When `enabled` is false, every candidate keeps its own slot (pre-merge behavior).
+ */
+function groupByKey<T, K>(candidates: readonly T[], key: (item: T) => K, enabled: boolean): T[][] {
+  if (!enabled) return candidates.map((item) => [item])
+  const groups = new Map<K, T[]>()
+  for (const item of candidates) {
+    const group = groups.get(key(item))
+    if (group) group.push(item)
+    else groups.set(key(item), [item])
+  }
+  return [...groups.values()]
+}
+
 /** Uniform-random pick of a (string, note) round, never repeating the previous note's sound back-to-back. */
 export function pickRandomRound(
   strings: StringName[],
   noteIds: NoteId[],
   range: FretRange,
   previousPitchClass: PitchClass | null,
+  mergeAccidentalSpellings = true,
 ): RoundPick {
   const reachable = reachableNoteIds(strings, noteIds, range)
   assertReachable(reachable)
@@ -51,7 +69,8 @@ export function pickRandomRound(
     reachable.map((noteId) => ({ noteId, pitchClass: noteIdToPitchClass(noteId) })),
     previousPitchClass,
   )
-  const { noteId, pitchClass } = pickRandomFrom(candidates)
+  const groups = groupByKey(candidates, (item) => item.pitchClass, mergeAccidentalSpellings)
+  const { noteId, pitchClass } = pickRandomFrom(pickRandomFrom(groups))
   const stringName = pickRandomFrom(stringsForNoteId(strings, noteId, range))
   return { stringName, noteId, pitchClass }
 }
@@ -70,15 +89,25 @@ export function listReachablePairs(strings: StringName[], noteIds: NoteId[], ran
   return pairs
 }
 
-function pickWeightedPairFrom(pairs: readonly RoundPick[], weights: PairWeights): RoundPick {
-  const weightOf = (pair: RoundPick) => weights[makeStatsKey(pair.stringName, pair.noteId)] ?? 1
-  const total = pairs.reduce((sum, pair) => sum + weightOf(pair), 0)
+function weightOfPair(pair: RoundPick, weights: PairWeights): number {
+  return weights[makeStatsKey(pair.stringName, pair.noteId)] ?? 1
+}
+
+/** A group's weight is the average of its members' weights, so merging two accidental
+ * spellings into one slot doesn't double-count their combined pick chance. */
+function weightOfGroup(group: readonly RoundPick[], weights: PairWeights): number {
+  const total = group.reduce((sum, pair) => sum + weightOfPair(pair, weights), 0)
+  return total / group.length
+}
+
+function pickWeightedGroupFrom(groups: readonly RoundPick[][], weights: PairWeights): RoundPick[] {
+  const total = groups.reduce((sum, group) => sum + weightOfGroup(group, weights), 0)
   let roll = Math.random() * total
-  for (const pair of pairs) {
-    roll -= weightOf(pair)
-    if (roll <= 0) return pair
+  for (const group of groups) {
+    roll -= weightOfGroup(group, weights)
+    if (roll <= 0) return group
   }
-  return pairs[pairs.length - 1]
+  return groups[groups.length - 1]
 }
 
 /**
@@ -92,9 +121,11 @@ export function pickWeightedRound(
   range: FretRange,
   previousPitchClass: PitchClass | null,
   weights: PairWeights,
+  mergeAccidentalSpellings = true,
 ): RoundPick {
   const pairs = listReachablePairs(strings, noteIds, range)
   assertReachable(pairs)
   const candidates = excludingPreviousPitch(pairs, previousPitchClass)
-  return pickWeightedPairFrom(candidates, weights)
+  const groups = groupByKey(candidates, (pair) => `${pair.stringName}:${pair.pitchClass}`, mergeAccidentalSpellings)
+  return pickRandomFrom(pickWeightedGroupFrom(groups, weights))
 }

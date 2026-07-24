@@ -1,9 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
   loadFeedbackMessagesEnabled,
+  loadMergeAccidentalSpellingsEnabled,
   loadMicSensitivity,
   loadSoundEnabled,
   saveFeedbackMessagesEnabled,
+  saveMergeAccidentalSpellingsEnabled,
   saveMicSensitivity,
   saveSoundEnabled,
 } from './preferences'
@@ -77,5 +79,18 @@ describe('mic sensitivity preference persistence', () => {
     const raw = JSON.parse(localStorage.getItem('music-note:v1')!)
     expect(raw.adaptiveStats['E:C']).toEqual({ avgResponseTimeMs: 1000, sampleCount: 1 })
     expect(raw.micSensitivity).toBe('low')
+  })
+})
+
+describe('merge accidental spellings preference persistence', () => {
+  it('defaults to enabled when nothing has been saved yet', () => {
+    expect(loadMergeAccidentalSpellingsEnabled()).toBe(true)
+  })
+
+  it('round-trips a saved value through localStorage', () => {
+    saveMergeAccidentalSpellingsEnabled(false)
+    expect(loadMergeAccidentalSpellingsEnabled()).toBe(false)
+    saveMergeAccidentalSpellingsEnabled(true)
+    expect(loadMergeAccidentalSpellingsEnabled()).toBe(true)
   })
 })

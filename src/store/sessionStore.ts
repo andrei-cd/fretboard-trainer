@@ -9,6 +9,7 @@ import {
   pickWeightedRound,
 } from '../lib/music-theory'
 import { useStatsStore } from './statsStore'
+import { usePreferencesStore } from './preferencesStore'
 
 interface SessionStore {
   config: SessionConfig
@@ -42,6 +43,8 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       return
     }
 
+    const mergeAccidentalSpellings = usePreferencesStore.getState().mergeAccidentalSpellingsEnabled
+
     const pick =
       mode === 'adaptive'
         ? pickWeightedRound(
@@ -50,8 +53,9 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
             fretRange,
             round.previousPitchClass,
             useStatsStore.getState().getWeights(listReachablePairs(selectedStrings, selectedNotes, fretRange)),
+            mergeAccidentalSpellings,
           )
-        : pickRandomRound(selectedStrings, selectedNotes, fretRange, round.previousPitchClass)
+        : pickRandomRound(selectedStrings, selectedNotes, fretRange, round.previousPitchClass, mergeAccidentalSpellings)
 
     set({
       round: {

@@ -92,6 +92,12 @@
   gap: 6px 12px;
 }
 
+.mergeAccidentalsOption {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
 .inlineActions {
   display: flex;
   gap: 8px;
