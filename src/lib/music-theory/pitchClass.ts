@@ -61,3 +61,10 @@ const NOTE_IDS_BY_PITCH_CLASS: readonly NoteId[][] = ALL_PITCH_CLASSES.map((pc) 
 export function noteIdsForPitchClass(pc: PitchClass): readonly NoteId[] {
   return NOTE_IDS_BY_PITCH_CLASS[((pc % 12) + 12) % 12]
 }
+
+/** Scientific pitch notation, e.g. midiNoteToLabel(66) -> "F#3" (MIDI 60 = C4). */
+export function midiNoteToLabel(midiNote: number, spelling: 'sharp' | 'flat' = 'sharp'): string {
+  const pitchClass = ((midiNote % 12) + 12) % 12
+  const octave = Math.floor(midiNote / 12) - 1
+  return `${pitchClassToLabel(pitchClass, spelling)}${octave}`
+}

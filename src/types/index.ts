@@ -1,5 +1,12 @@
 export type Mode = 'normal' | 'timer' | 'mic' | 'adaptive'
 
+/**
+ * How readily the mic picks up a note. 'low' favors fewer false positives from background
+ * noise (requires a louder, cleaner signal); 'high' favors picking up quiet/soft playing at
+ * the cost of being more prone to false positives.
+ */
+export type MicSensitivity = 'low' | 'medium' | 'high'
+
 /** 0-11, 0 = C, following standard pitch-class numbering (C, C#, D, ... B). */
 export type PitchClass = number
 

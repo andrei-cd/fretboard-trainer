@@ -3,6 +3,7 @@ import {
   ACCIDENTAL_NOTE_ID_PAIRS,
   ALL_NOTE_IDS,
   DEFAULT_NOTE_IDS,
+  midiNoteToLabel,
   NATURAL_NOTE_IDS,
   noteIdsForPitchClass,
   noteIdToPitchClass,
@@ -81,5 +82,24 @@ describe('noteIdsForPitchClass', () => {
 
   it('normalizes out-of-range pitch classes', () => {
     expect(noteIdsForPitchClass(13)).toEqual(['C#', 'Db'])
+  })
+})
+
+describe('midiNoteToLabel', () => {
+  it('labels A440 as A4', () => {
+    expect(midiNoteToLabel(69)).toBe('A4')
+  })
+
+  it('labels the low E string open note as E2', () => {
+    expect(midiNoteToLabel(40)).toBe('E2')
+  })
+
+  it('labels middle C as C4', () => {
+    expect(midiNoteToLabel(60)).toBe('C4')
+  })
+
+  it('supports flat spelling', () => {
+    expect(midiNoteToLabel(66, 'flat')).toBe('Gb4')
+    expect(midiNoteToLabel(66)).toBe('F#4')
   })
 })

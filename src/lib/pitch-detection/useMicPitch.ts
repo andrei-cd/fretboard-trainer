@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { PitchDetector } from 'pitchy'
+import type { MicSensitivity } from '../../types'
 import { frequencyToNote, type DetectedNote } from './pitchToNote'
 
 export type MicStatus = 'idle' | 'requesting' | 'granted' | 'denied' | 'error'
@@ -16,12 +17,37 @@ interface UseMicPitchOptions {
   active: boolean
   /** Minimum pitchy clarity (0-1) required to accept a reading. */
   minClarity?: number
+  /** Minimum input volume (dBFS) below which pitchy won't attempt detection. Less negative = stricter. */
+  minVolumeDecibels?: number
 }
 
 const FFT_SIZE = 2048
 const IDLE_STATE: MicPitchState = { status: 'idle', detected: null, clarity: 0 }
 
-export function useMicPitch({ active, minClarity = 0.9 }: UseMicPitchOptions): MicPitchState {
+/**
+ * Frequencies outside a guitar's practical range (including a capo/high frets) are almost
+ * certainly noise — mains hum, room rumble, breath, hiss — not a played note, so readings
+ * outside this band are rejected before they ever reach the stability tracker.
+ */
+const MIN_PLAUSIBLE_HZ = 70
+const MAX_PLAUSIBLE_HZ = 1500
+
+/**
+ * 'low' requires a louder, cleaner signal (fewer false positives from background noise, but
+ * may miss quiet playing); 'high' picks up quieter/softer notes at the cost of being more
+ * prone to false positives from ambient noise.
+ */
+export const MIC_SENSITIVITY_PRESETS: Record<MicSensitivity, { minClarity: number; minVolumeDecibels: number }> = {
+  low: { minClarity: 0.95, minVolumeDecibels: -35 },
+  medium: { minClarity: 0.92, minVolumeDecibels: -40 },
+  high: { minClarity: 0.88, minVolumeDecibels: -45 },
+}
+
+export function useMicPitch({
+  active,
+  minClarity = 0.9,
+  minVolumeDecibels = -45,
+}: UseMicPitchOptions): MicPitchState {
   const [state, setState] = useState<MicPitchState>(IDLE_STATE)
 
   useEffect(() => {
@@ -51,7 +77,7 @@ export function useMicPitch({ active, minClarity = 0.9 }: UseMicPitchOptions): M
         source.connect(analyser)
 
         const detector = PitchDetector.forFloat32Array(analyser.fftSize)
-        detector.minVolumeDecibels = -45
+        detector.minVolumeDecibels = minVolumeDecibels
         const buffer = new Float32Array(detector.inputLength)
 
         setState({ status: 'granted', detected: null, clarity: 0 })
@@ -60,7 +86,8 @@ export function useMicPitch({ active, minClarity = 0.9 }: UseMicPitchOptions): M
           if (cancelled || !audioContext) return
           analyser.getFloatTimeDomainData(buffer)
           const [frequency, clarity] = detector.findPitch(buffer, audioContext.sampleRate)
-          const detected = clarity >= minClarity && frequency > 0 ? frequencyToNote(frequency) : null
+          const inPlausibleRange = frequency >= MIN_PLAUSIBLE_HZ && frequency <= MAX_PLAUSIBLE_HZ
+          const detected = clarity >= minClarity && inPlausibleRange ? frequencyToNote(frequency) : null
           setState({ status: 'granted', detected, clarity })
           rafId = requestAnimationFrame(tick)
         }
@@ -85,7 +112,7 @@ export function useMicPitch({ active, minClarity = 0.9 }: UseMicPitchOptions): M
       stream?.getTracks().forEach((t) => t.stop())
       void audioContext?.close()
     }
-  }, [active, minClarity])
+  }, [active, minClarity, minVolumeDecibels])
 
   return state
 }
