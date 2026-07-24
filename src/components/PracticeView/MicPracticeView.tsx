@@ -33,7 +33,7 @@ export function MicPracticeView() {
     const confirmed = trackerRef.current.push(micState.detected, Date.now())
     if (confirmed !== null && confirmed === current.pitchClass) {
       const responseTimeMs = roundStartedAt ? Date.now() - roundStartedAt : 0
-      recordSample(current.pitchClass, responseTimeMs)
+      recordSample(current.noteId, responseTimeMs)
       nextRound()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

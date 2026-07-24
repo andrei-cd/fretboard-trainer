@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { noteNameToPitchClass, pitchClassToEnharmonicLabel, pitchClassToLabel } from './pitchClass'
+import {
+  ACCIDENTAL_NOTE_ID_PAIRS,
+  ALL_NOTE_IDS,
+  DEFAULT_NOTE_IDS,
+  NATURAL_NOTE_IDS,
+  noteIdToPitchClass,
+  noteNameToPitchClass,
+  pitchClassToLabel,
+} from './pitchClass'
 
 describe('pitchClassToLabel', () => {
   it('returns sharp spelling by default', () => {
@@ -31,12 +39,32 @@ describe('noteNameToPitchClass', () => {
   })
 })
 
-describe('pitchClassToEnharmonicLabel', () => {
-  it('combines sharp and flat spellings for accidentals', () => {
-    expect(pitchClassToEnharmonicLabel(1)).toBe('C#/Db')
+describe('noteIdToPitchClass', () => {
+  it('maps enharmonic spellings to the same pitch class', () => {
+    expect(noteIdToPitchClass('F#')).toBe(noteIdToPitchClass('Gb'))
   })
 
-  it('returns a single name for naturals', () => {
-    expect(pitchClassToEnharmonicLabel(0)).toBe('C')
+  it('treats naturals as distinct pitch classes', () => {
+    expect(noteIdToPitchClass('C')).not.toBe(noteIdToPitchClass('D'))
+  })
+})
+
+describe('note id groupings', () => {
+  it('has 17 total note ids: 7 naturals + 5 sharp/flat pairs', () => {
+    expect(ALL_NOTE_IDS.length).toBe(17)
+    expect(NATURAL_NOTE_IDS.length).toBe(7)
+    expect(ACCIDENTAL_NOTE_ID_PAIRS.length).toBe(5)
+  })
+
+  it('every accidental pair shares a pitch class', () => {
+    for (const [sharp, flat] of ACCIDENTAL_NOTE_ID_PAIRS) {
+      expect(noteIdToPitchClass(sharp)).toBe(noteIdToPitchClass(flat))
+    }
+  })
+
+  it('defaults to naturals + sharps only, excluding flat spellings', () => {
+    expect(DEFAULT_NOTE_IDS.length).toBe(12)
+    expect(DEFAULT_NOTE_IDS).not.toContain('Db')
+    expect(DEFAULT_NOTE_IDS).not.toContain('Gb')
   })
 })

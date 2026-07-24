@@ -1,5 +1,5 @@
-import { ALL_PITCH_CLASSES, pitchClassToEnharmonicLabel } from '../../lib/music-theory'
-import type { PitchClass } from '../../types'
+import { ACCIDENTAL_NOTE_ID_PAIRS, ALL_NOTE_IDS, NATURAL_NOTE_IDS } from '../../lib/music-theory'
+import type { NoteId } from '../../types'
 import { useSessionStore } from '../../store/sessionStore'
 import styles from './SettingsPanel.module.css'
 
@@ -7,13 +7,13 @@ export function NoteSelector() {
   const selectedNotes = useSessionStore((s) => s.config.selectedNotes)
   const setConfig = useSessionStore((s) => s.setConfig)
 
-  function toggle(pc: PitchClass) {
-    const next = selectedNotes.includes(pc) ? selectedNotes.filter((n) => n !== pc) : [...selectedNotes, pc]
+  function toggle(id: NoteId) {
+    const next = selectedNotes.includes(id) ? selectedNotes.filter((n) => n !== id) : [...selectedNotes, id]
     setConfig({ selectedNotes: next })
   }
 
   function selectAll() {
-    setConfig({ selectedNotes: [...ALL_PITCH_CLASSES] })
+    setConfig({ selectedNotes: [...ALL_NOTE_IDS] })
   }
 
   function selectNone() {
@@ -24,11 +24,25 @@ export function NoteSelector() {
     <fieldset className={styles.fieldset}>
       <legend>Notes</legend>
       <div className={styles.checkboxGrid}>
-        {ALL_PITCH_CLASSES.map((pc) => (
-          <label key={pc} className={styles.checkboxOption}>
-            <input type="checkbox" checked={selectedNotes.includes(pc)} onChange={() => toggle(pc)} />
-            {pitchClassToEnharmonicLabel(pc)}
+        {NATURAL_NOTE_IDS.map((id) => (
+          <label key={id} className={styles.checkboxOption}>
+            <input type="checkbox" checked={selectedNotes.includes(id)} onChange={() => toggle(id)} />
+            {id}
           </label>
+        ))}
+      </div>
+      <div className={styles.accidentalList}>
+        {ACCIDENTAL_NOTE_ID_PAIRS.map(([sharp, flat]) => (
+          <div className={styles.accidentalRow} key={sharp}>
+            <label className={styles.checkboxOption}>
+              <input type="checkbox" checked={selectedNotes.includes(sharp)} onChange={() => toggle(sharp)} />
+              {sharp}
+            </label>
+            <label className={styles.checkboxOption}>
+              <input type="checkbox" checked={selectedNotes.includes(flat)} onChange={() => toggle(flat)} />
+              {flat}
+            </label>
+          </div>
         ))}
       </div>
       <div className={styles.inlineActions}>

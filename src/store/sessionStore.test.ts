@@ -20,7 +20,7 @@ describe('sessionStore', () => {
     expect(isNoteOnString(current!.stringName, current!.pitchClass, DEFAULT_SESSION_CONFIG.fretRange)).toBe(true)
   })
 
-  it('never repeats the previous note across successive rounds', () => {
+  it('never repeats the previous note (by sound) across successive rounds', () => {
     let previous: number | null = null
     for (let i = 0; i < 100; i++) {
       useSessionStore.getState().nextRound()
@@ -40,17 +40,28 @@ describe('sessionStore', () => {
     // Three eligible notes so the no-repeat rule doesn't force a strict 50/50 alternation.
     useStatsStore.setState({
       stats: {
-        0: { avgResponseTimeMs: 5000, sampleCount: 10 },
-        1: { avgResponseTimeMs: 300, sampleCount: 10 },
+        C: { avgResponseTimeMs: 5000, sampleCount: 10 },
+        'C#': { avgResponseTimeMs: 300, sampleCount: 10 },
       },
     })
-    useSessionStore.getState().setConfig({ mode: 'adaptive', selectedNotes: [0, 1, 2] })
-    const counts = { 0: 0, 1: 0, 2: 0 } as Record<number, number>
+    useSessionStore.getState().setConfig({ mode: 'adaptive', selectedNotes: ['C', 'C#', 'D'] })
+    const counts = { C: 0, 'C#': 0, D: 0 } as Record<string, number>
     for (let i = 0; i < 600; i++) {
       useSessionStore.getState().nextRound()
-      counts[useSessionStore.getState().round.current!.pitchClass]++
+      counts[useSessionStore.getState().round.current!.noteId]++
     }
-    expect(counts[0]).toBeGreaterThan(counts[1])
-    expect(counts[0]).toBeGreaterThan(counts[2])
+    expect(counts.C).toBeGreaterThan(counts['C#'])
+    expect(counts.C).toBeGreaterThan(counts.D)
+  })
+
+  it('tracks F# and Gb as independently selectable notes that still block each other back-to-back', () => {
+    useSessionStore.getState().setConfig({ selectedStrings: ['E'], selectedNotes: ['F#', 'Gb', 'A'] })
+    let previousPitchClass: number | null = null
+    for (let i = 0; i < 100; i++) {
+      useSessionStore.getState().nextRound()
+      const { current } = useSessionStore.getState().round
+      if (previousPitchClass !== null) expect(current!.pitchClass).not.toBe(previousPitchClass)
+      previousPitchClass = current!.pitchClass
+    }
   })
 })

@@ -1,4 +1,3 @@
-import { pitchClassToEnharmonicLabel } from '../../lib/music-theory'
 import { useSessionStore } from '../../store/sessionStore'
 import styles from './PracticeView.module.css'
 
@@ -16,7 +15,7 @@ export function NoteDisplay() {
   return (
     <div className={styles.noteDisplay}>
       <div className={styles.stringLabel}>String: {current.stringName === 'e' ? 'high e' : current.stringName}</div>
-      <div className={styles.noteLabel}>{pitchClassToEnharmonicLabel(current.pitchClass)}</div>
+      <div className={styles.noteLabel}>{current.noteId}</div>
     </div>
   )
 }

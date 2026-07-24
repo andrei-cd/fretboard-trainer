@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { AdaptiveStatsMap, PitchClass } from '../types'
+import type { AdaptiveStatsMap, NoteId, NoteWeights } from '../types'
 import {
   computeWeights,
   loadAdaptiveStats,
@@ -10,16 +10,16 @@ import {
 
 interface StatsStore {
   stats: AdaptiveStatsMap
-  recordSample: (pitchClass: PitchClass, responseTimeMs: number) => void
+  recordSample: (noteId: NoteId, responseTimeMs: number) => void
   resetStats: () => void
-  getWeights: (pitchClasses: readonly PitchClass[]) => Record<PitchClass, number>
+  getWeights: (noteIds: readonly NoteId[]) => NoteWeights
 }
 
 export const useStatsStore = create<StatsStore>((set, get) => ({
   stats: loadAdaptiveStats(),
 
-  recordSample: (pitchClass, responseTimeMs) => {
-    const next = recordSamplePure(get().stats, pitchClass, responseTimeMs)
+  recordSample: (noteId, responseTimeMs) => {
+    const next = recordSamplePure(get().stats, noteId, responseTimeMs)
     saveAdaptiveStats(next)
     set({ stats: next })
   },
@@ -29,5 +29,5 @@ export const useStatsStore = create<StatsStore>((set, get) => ({
     set({ stats: {} })
   },
 
-  getWeights: (pitchClasses) => computeWeights(get().stats, pitchClasses),
+  getWeights: (noteIds) => computeWeights(get().stats, noteIds),
 }))

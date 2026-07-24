@@ -77,6 +77,21 @@
   cursor: pointer;
 }
 
+.accidentalList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.accidentalRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 12px;
+}
+
 .inlineActions {
   display: flex;
   gap: 8px;

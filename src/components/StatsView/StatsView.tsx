@@ -1,4 +1,4 @@
-import { ALL_PITCH_CLASSES, pitchClassToEnharmonicLabel } from '../../lib/music-theory'
+import { ALL_NOTE_IDS } from '../../lib/music-theory'
 import { useStatsStore } from '../../store/statsStore'
 import { ResetStatsButton } from './ResetStatsButton'
 import styles from './StatsView.module.css'
@@ -6,10 +6,9 @@ import styles from './StatsView.module.css'
 export function StatsView() {
   const stats = useStatsStore((s) => s.stats)
 
-  const rows = ALL_PITCH_CLASSES.map((pc) => ({
-    pitchClass: pc,
-    label: pitchClassToEnharmonicLabel(pc),
-    entry: stats[pc] ?? null,
+  const rows = ALL_NOTE_IDS.map((noteId) => ({
+    noteId,
+    entry: stats[noteId] ?? null,
   })).sort((a, b) => (b.entry?.avgResponseTimeMs ?? -1) - (a.entry?.avgResponseTimeMs ?? -1))
 
   const maxAvg = Math.max(1, ...rows.map((r) => r.entry?.avgResponseTimeMs ?? 0))
@@ -31,8 +30,8 @@ export function StatsView() {
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.pitchClass}>
-              <td className={styles.noteCell}>{row.label}</td>
+            <tr key={row.noteId}>
+              <td className={styles.noteCell}>{row.noteId}</td>
               <td>{row.entry ? `${(row.entry.avgResponseTimeMs / 1000).toFixed(2)}s` : '—'}</td>
               <td>{row.entry?.sampleCount ?? 0}</td>
               <td className={styles.barCell}>

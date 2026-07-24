@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { RoundState, SessionConfig } from '../types'
-import { ALL_PITCH_CLASSES, DEFAULT_FRET_RANGE, STRING_NAMES, pickRandomRound, pickWeightedRound } from '../lib/music-theory'
+import { DEFAULT_FRET_RANGE, DEFAULT_NOTE_IDS, STRING_NAMES, pickRandomRound, pickWeightedRound } from '../lib/music-theory'
 import { useStatsStore } from './statsStore'
 
 interface SessionStore {
@@ -13,7 +13,7 @@ interface SessionStore {
 export const DEFAULT_SESSION_CONFIG: SessionConfig = {
   mode: 'normal',
   selectedStrings: [...STRING_NAMES],
-  selectedNotes: [...ALL_PITCH_CLASSES],
+  selectedNotes: [...DEFAULT_NOTE_IDS],
   fretRange: DEFAULT_FRET_RANGE,
   timerSeconds: 5,
 }

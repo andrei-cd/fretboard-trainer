@@ -1,4 +1,4 @@
-import type { PitchClass } from '../../types'
+import type { NoteId, PitchClass } from '../../types'
 
 export const NOTE_NAMES_SHARP: readonly string[] = [
   'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
@@ -11,17 +11,31 @@ export const NOTE_NAMES_FLAT: readonly string[] = [
 /** All 12 pitch classes, 0-11. */
 export const ALL_PITCH_CLASSES: readonly PitchClass[] = Array.from({ length: 12 }, (_, i) => i)
 
+/** Every selectable note spelling, ordered by pitch class (sharp before flat for accidentals). */
+export const ALL_NOTE_IDS: readonly NoteId[] = [
+  'C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B',
+]
+
+export const NATURAL_NOTE_IDS: readonly NoteId[] = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+
+/** Sharp/flat spelling pairs for each of the 5 accidental pitch classes. */
+export const ACCIDENTAL_NOTE_ID_PAIRS: readonly [NoteId, NoteId][] = [
+  ['C#', 'Db'],
+  ['D#', 'Eb'],
+  ['F#', 'Gb'],
+  ['G#', 'Ab'],
+  ['A#', 'Bb'],
+]
+
+/** Default selection: naturals + sharp spellings only, matching the pre-enharmonic-split defaults. */
+export const DEFAULT_NOTE_IDS: readonly NoteId[] = [
+  'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
+]
+
 export function pitchClassToLabel(pc: PitchClass, spelling: 'sharp' | 'flat' = 'sharp'): string {
   const names = spelling === 'flat' ? NOTE_NAMES_FLAT : NOTE_NAMES_SHARP
   const normalized = ((pc % 12) + 12) % 12
   return names[normalized]
-}
-
-/** Combined enharmonic label, e.g. "C#/Db". Naturals (no accidental) return just the single name. */
-export function pitchClassToEnharmonicLabel(pc: PitchClass): string {
-  const sharp = pitchClassToLabel(pc, 'sharp')
-  const flat = pitchClassToLabel(pc, 'flat')
-  return sharp === flat ? sharp : `${sharp}/${flat}`
 }
 
 /** Parses a note name like "F#", "Gb", "C" into a pitch class 0-11. Throws on invalid input. */
@@ -32,4 +46,9 @@ export function noteNameToPitchClass(name: string): PitchClass {
   const flatIndex = NOTE_NAMES_FLAT.findIndex((n) => n === trimmed)
   if (flatIndex !== -1) return flatIndex
   throw new Error(`Invalid note name: "${name}"`)
+}
+
+/** A NoteId's underlying pitch class — e.g. both "F#" and "Gb" resolve to 6. */
+export function noteIdToPitchClass(noteId: NoteId): PitchClass {
+  return noteNameToPitchClass(noteId)
 }

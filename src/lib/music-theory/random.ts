@@ -1,11 +1,12 @@
-import type { FretRange, PitchClass, RoundPick, StringName } from '../../types'
+import type { FretRange, NoteId, NoteWeights, PitchClass, RoundPick, StringName } from '../../types'
 import { isNoteOnString } from './fretboard'
+import { noteIdToPitchClass } from './pitchClass'
 
 function pickRandomFrom<T>(items: readonly T[]): T {
   return items[Math.floor(Math.random() * items.length)]
 }
 
-function pickWeightedFrom(items: readonly PitchClass[], weights: Record<PitchClass, number>): PitchClass {
+function pickWeightedFrom(items: readonly NoteId[], weights: NoteWeights): NoteId {
   const total = items.reduce((sum, item) => sum + (weights[item] ?? 1), 0)
   let roll = Math.random() * total
   for (const item of items) {
@@ -15,55 +16,63 @@ function pickWeightedFrom(items: readonly PitchClass[], weights: Record<PitchCla
   return items[items.length - 1]
 }
 
-/** Notes from `notes` that are actually playable on at least one of `strings` within `range`. */
-function reachableNotes(strings: StringName[], notes: PitchClass[], range: FretRange): PitchClass[] {
-  return notes.filter((note) => strings.some((s) => isNoteOnString(s, note, range)))
+/** Note ids from `noteIds` that are actually playable on at least one of `strings` within `range`. */
+function reachableNoteIds(strings: StringName[], noteIds: NoteId[], range: FretRange): NoteId[] {
+  return noteIds.filter((id) => strings.some((s) => isNoteOnString(s, noteIdToPitchClass(id), range)))
 }
 
-/** Strings (among `strings`) on which `note` is playable within `range`. */
-function stringsForNote(strings: StringName[], note: PitchClass, range: FretRange): StringName[] {
-  return strings.filter((s) => isNoteOnString(s, note, range))
+/** Strings (among `strings`) on which `noteId` is playable within `range`. */
+function stringsForNoteId(strings: StringName[], noteId: NoteId, range: FretRange): StringName[] {
+  const pitchClass = noteIdToPitchClass(noteId)
+  return strings.filter((s) => isNoteOnString(s, pitchClass, range))
 }
 
-function excludingPrevious(candidates: PitchClass[], previous: PitchClass | null): PitchClass[] {
-  if (candidates.length <= 1 || previous === null) return candidates
-  const filtered = candidates.filter((c) => c !== previous)
+/**
+ * Excludes candidates that sound like the previous round (same pitch class), even across
+ * enharmonic spellings — e.g. after F#, Gb is also blocked. Falls back to the full candidate
+ * set if that would eliminate every option (only one sound is reachable at all).
+ */
+function excludingPreviousPitch(candidates: NoteId[], previousPitchClass: PitchClass | null): NoteId[] {
+  if (candidates.length <= 1 || previousPitchClass === null) return candidates
+  const filtered = candidates.filter((id) => noteIdToPitchClass(id) !== previousPitchClass)
   return filtered.length > 0 ? filtered : candidates
 }
 
-function assertReachable(reachable: PitchClass[]): void {
+function assertReachable(reachable: NoteId[]): void {
   if (reachable.length === 0) {
     throw new Error('No eligible notes are reachable on the selected strings within the fret range')
   }
 }
 
-/** Uniform-random pick of a (string, note) round, never repeating the previous note name back-to-back. */
+function buildPick(strings: StringName[], noteId: NoteId, range: FretRange): RoundPick {
+  const pitchClass = noteIdToPitchClass(noteId)
+  const stringName = pickRandomFrom(stringsForNoteId(strings, noteId, range))
+  return { stringName, noteId, pitchClass }
+}
+
+/** Uniform-random pick of a (string, note) round, never repeating the previous note's sound back-to-back. */
 export function pickRandomRound(
   strings: StringName[],
-  notes: PitchClass[],
+  noteIds: NoteId[],
   range: FretRange,
-  previous: PitchClass | null,
+  previousPitchClass: PitchClass | null,
 ): RoundPick {
-  const reachable = reachableNotes(strings, notes, range)
+  const reachable = reachableNoteIds(strings, noteIds, range)
   assertReachable(reachable)
-  const candidates = excludingPrevious(reachable, previous)
-  const pitchClass = pickRandomFrom(candidates)
-  const stringName = pickRandomFrom(stringsForNote(strings, pitchClass, range))
-  return { stringName, pitchClass }
+  const candidates = excludingPreviousPitch(reachable, previousPitchClass)
+  return buildPick(strings, pickRandomFrom(candidates), range)
 }
 
 /** Weighted pick of a (string, note) round; higher weight = more likely to be picked. */
 export function pickWeightedRound(
   strings: StringName[],
-  notes: PitchClass[],
+  noteIds: NoteId[],
   range: FretRange,
-  previous: PitchClass | null,
-  weights: Record<PitchClass, number>,
+  previousPitchClass: PitchClass | null,
+  weights: NoteWeights,
 ): RoundPick {
-  const reachable = reachableNotes(strings, notes, range)
+  const reachable = reachableNoteIds(strings, noteIds, range)
   assertReachable(reachable)
-  const candidates = excludingPrevious(reachable, previous)
-  const pitchClass = pickWeightedFrom(candidates, weights)
-  const stringName = pickRandomFrom(stringsForNote(strings, pitchClass, range))
-  return { stringName, pitchClass }
+  const candidates = excludingPreviousPitch(reachable, previousPitchClass)
+  return buildPick(strings, pickWeightedFrom(candidates, weights), range)
 }
