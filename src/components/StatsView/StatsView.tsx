@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useStatsStore } from '../../store/statsStore'
 import { ResetStatsButton } from './ResetStatsButton'
+import { ResetStringStatsButton } from './ResetStringStatsButton'
 import { StatsHeatmap } from './StatsHeatmap'
 import { FretboardHeatmap } from './FretboardHeatmap'
 import { HeatmapLegend } from './HeatmapLegend'
@@ -16,7 +17,12 @@ export function StatsView() {
     <div className={styles.statsView}>
       <div className={styles.header}>
         <h3>Note response times</h3>
-        {hasData && <ResetStatsButton />}
+        {hasData && (
+          <div className={styles.headerActions}>
+            <ResetStringStatsButton />
+            <ResetStatsButton />
+          </div>
+        )}
       </div>
       {hasData ? (
         <>

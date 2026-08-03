@@ -1,4 +1,5 @@
-import type { AdaptiveStatsMap, PairWeights, StatsKey } from '../../types'
+import type { AdaptiveStatsMap, PairWeights, StatsKey, StringName } from '../../types'
+import { parseStatsKey } from '../music-theory/statsKey'
 import { loadState, saveState } from './index'
 
 /** How much weight a new sample carries in the rolling average (0-1, higher = more reactive). */
@@ -18,6 +19,15 @@ export function saveAdaptiveStats(stats: AdaptiveStatsMap): void {
 
 export function resetAdaptiveStats(): void {
   saveAdaptiveStats({})
+}
+
+/** Pure — returns a new stats map with every entry for `stringName` removed. */
+export function resetStringStats(stats: AdaptiveStatsMap, stringName: StringName): AdaptiveStatsMap {
+  const next: AdaptiveStatsMap = {}
+  for (const [key, entry] of Object.entries(stats) as [StatsKey, AdaptiveStatsMap[StatsKey]][]) {
+    if (parseStatsKey(key).stringName !== stringName) next[key] = entry
+  }
+  return next
 }
 
 /** Pure rolling-average update — returns a new stats map, does not mutate or persist. */

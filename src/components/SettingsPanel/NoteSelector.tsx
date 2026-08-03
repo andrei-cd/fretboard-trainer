@@ -29,17 +29,20 @@ export function NoteSelector() {
     setConfig({ selectedNotes: [] });
   }
 
-  function selectNaturals() {
-    setConfig({ selectedNotes: [...NATURAL_NOTE_IDS] });
+  /** Adds every note in `group` to the selection, or removes them all if the whole group is already selected. */
+  function toggleGroup(group: readonly NoteId[]) {
+    const allSelected = group.every((id) => selectedNotes.includes(id));
+    const next = allSelected
+      ? selectedNotes.filter((id) => !group.includes(id))
+      : [...selectedNotes, ...group.filter((id) => !selectedNotes.includes(id))];
+    setConfig({ selectedNotes: next });
   }
 
-  function selectSharps() {
-    setConfig({ selectedNotes: ACCIDENTAL_NOTE_ID_PAIRS.map(([sharp]) => sharp) });
-  }
-
-  function selectFlats() {
-    setConfig({ selectedNotes: ACCIDENTAL_NOTE_ID_PAIRS.map(([, flat]) => flat) });
-  }
+  const sharpNoteIds = ACCIDENTAL_NOTE_ID_PAIRS.map(([sharp]) => sharp);
+  const flatNoteIds = ACCIDENTAL_NOTE_ID_PAIRS.map(([, flat]) => flat);
+  const naturalsActive = NATURAL_NOTE_IDS.every((id) => selectedNotes.includes(id));
+  const sharpsActive = sharpNoteIds.every((id) => selectedNotes.includes(id));
+  const flatsActive = flatNoteIds.every((id) => selectedNotes.includes(id));
 
   return (
     <fieldset className={styles.fieldset}>
@@ -95,13 +98,13 @@ export function NoteSelector() {
         </button>
       </div>
       <div className={styles.inlineActions}>
-        <button type="button" onClick={selectNaturals}>
+        <button type="button" data-active={naturalsActive} onClick={() => toggleGroup(NATURAL_NOTE_IDS)}>
           Naturals
         </button>
-        <button type="button" onClick={selectSharps}>
+        <button type="button" data-active={sharpsActive} onClick={() => toggleGroup(sharpNoteIds)}>
           Sharps
         </button>
-        <button type="button" onClick={selectFlats}>
+        <button type="button" data-active={flatsActive} onClick={() => toggleGroup(flatNoteIds)}>
           Flats
         </button>
       </div>

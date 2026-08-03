@@ -2,6 +2,16 @@ import type { FretRange, PitchClass, StringName } from '../../types'
 
 export const STRING_NAMES: readonly StringName[] = ['E', 'A', 'D', 'G', 'B', 'e']
 
+/** Human-readable label for each string, disambiguating low E from high e. */
+export const STRING_LABELS: Record<StringName, string> = {
+  E: 'E (low)',
+  A: 'A',
+  D: 'D',
+  G: 'G',
+  B: 'B',
+  e: 'e (high)',
+}
+
 /** Open-string pitch class for each string in standard tuning (low E to high e). */
 export const STANDARD_TUNING: Record<StringName, PitchClass> = {
   E: 4, // E2

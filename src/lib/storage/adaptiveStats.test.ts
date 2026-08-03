@@ -4,6 +4,7 @@ import {
   loadAdaptiveStats,
   recordSample,
   resetAdaptiveStats,
+  resetStringStats,
   saveAdaptiveStats,
 } from './adaptiveStats'
 import type { AdaptiveStatsMap } from '../../types'
@@ -85,5 +86,28 @@ describe('adaptive stats persistence', () => {
 
   it('returns empty stats when nothing has been saved yet', () => {
     expect(loadAdaptiveStats()).toEqual({})
+  })
+})
+
+describe('resetStringStats', () => {
+  it('removes only entries for the given string', () => {
+    const stats: AdaptiveStatsMap = {
+      'E:C': { avgResponseTimeMs: 1000, sampleCount: 1 },
+      'A:C': { avgResponseTimeMs: 2000, sampleCount: 1 },
+      'E:D': { avgResponseTimeMs: 1500, sampleCount: 1 },
+    }
+    const next = resetStringStats(stats, 'E')
+    expect(next).toEqual({ 'A:C': { avgResponseTimeMs: 2000, sampleCount: 1 } })
+  })
+
+  it('does not mutate the input map', () => {
+    const original: AdaptiveStatsMap = { 'E:C': { avgResponseTimeMs: 1000, sampleCount: 1 } }
+    resetStringStats(original, 'E')
+    expect(original).toEqual({ 'E:C': { avgResponseTimeMs: 1000, sampleCount: 1 } })
+  })
+
+  it('is a no-op when the string has no data', () => {
+    const stats: AdaptiveStatsMap = { 'A:C': { avgResponseTimeMs: 2000, sampleCount: 1 } }
+    expect(resetStringStats(stats, 'E')).toEqual(stats)
   })
 })

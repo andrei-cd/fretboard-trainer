@@ -118,6 +118,12 @@
   border-color: var(--accent);
 }
 
+.inlineActions button[data-active='true'] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+}
+
 .timerRow {
   display: flex;
   align-items: center;

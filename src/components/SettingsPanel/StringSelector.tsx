@@ -1,16 +1,7 @@
-import { STRING_NAMES } from '../../lib/music-theory'
+import { STRING_LABELS, STRING_NAMES } from '../../lib/music-theory'
 import type { StringName } from '../../types'
 import { useSessionStore } from '../../store/sessionStore'
 import styles from './SettingsPanel.module.css'
-
-const STRING_LABELS: Record<StringName, string> = {
-  E: 'E (low)',
-  A: 'A',
-  D: 'D',
-  G: 'G',
-  B: 'B',
-  e: 'e (high)',
-}
 
 export function StringSelector() {
   const selectedStrings = useSessionStore((s) => s.config.selectedStrings)
