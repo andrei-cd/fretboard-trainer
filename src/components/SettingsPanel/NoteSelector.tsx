@@ -46,7 +46,7 @@ export function NoteSelector() {
 
   return (
     <fieldset className={styles.fieldset}>
-      <legend>Notes</legend>
+      <legend className={styles.srOnly}>Notes</legend>
       <div className={styles.checkboxGrid}>
         {NATURAL_NOTE_IDS.map((id) => (
           <label key={id} className={styles.checkboxOption}>

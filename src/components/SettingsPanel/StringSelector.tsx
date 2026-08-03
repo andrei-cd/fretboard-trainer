@@ -20,7 +20,7 @@ export function StringSelector() {
 
   return (
     <fieldset className={styles.fieldset}>
-      <legend>Strings</legend>
+      <legend className={styles.srOnly}>Strings</legend>
       <div className={styles.checkboxGrid}>
         {STRING_NAMES.map((s) => (
           <label key={s} className={styles.checkboxOption}>

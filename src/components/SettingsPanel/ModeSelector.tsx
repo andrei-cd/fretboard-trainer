@@ -15,7 +15,7 @@ export function ModeSelector() {
 
   return (
     <fieldset className={styles.fieldset}>
-      <legend>Mode</legend>
+      <legend className={styles.srOnly}>Mode</legend>
       <div className={styles.modeList}>
         {MODES.map((m) => (
           <label key={m.value} className={styles.modeOption} data-active={mode === m.value}>

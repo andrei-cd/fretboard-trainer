@@ -10,7 +10,7 @@ export function TimerConfig() {
 
   return (
     <fieldset className={styles.fieldset}>
-      <legend>Countdown</legend>
+      <legend className={styles.srOnly}>Countdown</legend>
       <label className={styles.timerRow}>
         Seconds per note
         <input

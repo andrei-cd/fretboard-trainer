@@ -21,6 +21,9 @@ export interface PersistedSchemaV1 {
   metronomeLockToTimer?: boolean
   /** Undefined on data saved before this preference existed — treat as 4. */
   metronomeBeatsPerNote?: number
+  /** Undefined until the user manually toggles the theme — resolve from prefers-color-scheme at
+      runtime instead. Once set, this explicit choice wins on all future visits. */
+  themeOverride?: 'light' | 'dark'
   lastSessionConfig?: SessionConfig
 }
 

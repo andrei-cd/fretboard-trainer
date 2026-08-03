@@ -1,48 +1,75 @@
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/fonts/SpaceGrotesk-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/fonts/SpaceGrotesk-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --bg: #f7f7f8;
+  --bg: #f7f6fc;
   --surface: #ffffff;
-  --border: #e0e0e5;
+  --border: #e3e0f0;
   --text: #1a1a1e;
   --text-muted: #6b6b74;
-  --accent: #3b6fed;
+  --accent: #7e14ff;
+  --accent-2: #47bfff;
   --accent-contrast: #ffffff;
+  --accent-gradient: linear-gradient(135deg, #863bff 0%, #47bfff 100%);
   --success: #1f9d55;
   --danger: #d64545;
   --warning: #b8790a;
   --radius: 10px;
-  /* Sequential heatmap ramp (fast -> slow). Light mode: near-zero recedes toward the
+  --radius-lg: 20px;
+  --shadow-sm: 0 1px 2px rgba(20, 10, 40, 0.06);
+  --shadow-md: 0 4px 20px rgba(126, 20, 255, 0.14);
+  --shadow-glow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+  --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  /* Sequential heatmap ramp (fast -> slow), anchored on the brand blue so it stays visually
+     distinct from the purple interactive accent. Light mode: near-zero recedes toward the
      light surface, high magnitude goes dark. */
-  --heat-0: #cde2fb;
-  --heat-1: #86b6ef;
-  --heat-2: #3987e5;
-  --heat-3: #1c5cab;
-  --heat-4: #0d366b;
+  --heat-0: #d7ecff;
+  --heat-1: #8fd0fb;
+  --heat-2: #47bfff;
+  --heat-3: #1f8fd1;
+  --heat-4: #0c5487;
   --heat-none: #ececef;
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #17181c;
-    --surface: #212228;
-    --border: #34353c;
-    --text: #edecee;
-    --text-muted: #9a9aa2;
-    --accent: #6a93f7;
-    --accent-contrast: #10131a;
-    --success: #3fbf72;
-    --danger: #e46a6a;
-    --warning: #e0a636;
-    /* Anchor flips in dark mode: near-zero recedes toward the dark surface (dark step),
-       high magnitude pops bright against it (light step) — same ramp, reversed. */
-    --heat-0: #0d366b;
-    --heat-1: #1c5cab;
-    --heat-2: #3987e5;
-    --heat-3: #86b6ef;
-    --heat-4: #cde2fb;
-    --heat-none: #2a2b30;
-    color-scheme: dark;
-  }
+:root[data-theme='dark'] {
+  --bg: #14121c;
+  --surface: #1e1b29;
+  --border: #35304a;
+  --text: #eeecf5;
+  --text-muted: #a29cb8;
+  --accent: #a56bff;
+  --accent-2: #5fd0ff;
+  --accent-contrast: #14121c;
+  --accent-gradient: linear-gradient(135deg, #a56bff 0%, #5fd0ff 100%);
+  --success: #3fbf72;
+  --danger: #e46a6a;
+  --warning: #e0a636;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
+  /* Anchor flips in dark mode: near-zero recedes toward the dark surface, high magnitude
+     pops bright against it — same ramp, reversed. */
+  --heat-0: #0c5487;
+  --heat-1: #1f8fd1;
+  --heat-2: #47bfff;
+  --heat-3: #8fd0fb;
+  --heat-4: #d7ecff;
+  --heat-none: #2a2b30;
+  color-scheme: dark;
 }
 
 * {

@@ -9,6 +9,7 @@ import {
   loadMetronomeLockToTimer,
   loadMicSensitivity,
   loadSoundEnabled,
+  loadThemeOverride,
   saveFeedbackMessagesEnabled,
   saveMergeAccidentalSpellingsEnabled,
   saveMetronomeBeatsPerNote,
@@ -17,6 +18,7 @@ import {
   saveMetronomeLockToTimer,
   saveMicSensitivity,
   saveSoundEnabled,
+  saveThemeOverride,
 } from '../lib/storage/preferences'
 
 interface PreferencesStore {
@@ -29,6 +31,8 @@ interface PreferencesStore {
   /** Timer mode only: derive BPM from the countdown length instead of `metronomeBpm`. */
   metronomeLockToTimer: boolean
   metronomeBeatsPerNote: number
+  /** null until the user manually toggles the theme; from then on this explicit choice wins over the system preference. */
+  themeOverride: 'light' | 'dark' | null
   setSoundEnabled: (enabled: boolean) => void
   setFeedbackMessagesEnabled: (enabled: boolean) => void
   setMicSensitivity: (sensitivity: MicSensitivity) => void
@@ -37,6 +41,7 @@ interface PreferencesStore {
   setMetronomeBpm: (bpm: number) => void
   setMetronomeLockToTimer: (enabled: boolean) => void
   setMetronomeBeatsPerNote: (beats: number) => void
+  setThemeOverride: (theme: 'light' | 'dark') => void
 }
 
 export const usePreferencesStore = create<PreferencesStore>((set) => ({
@@ -48,6 +53,7 @@ export const usePreferencesStore = create<PreferencesStore>((set) => ({
   metronomeBpm: loadMetronomeBpm(),
   metronomeLockToTimer: loadMetronomeLockToTimer(),
   metronomeBeatsPerNote: loadMetronomeBeatsPerNote(),
+  themeOverride: loadThemeOverride(),
 
   setSoundEnabled: (enabled) => {
     saveSoundEnabled(enabled)
@@ -87,5 +93,10 @@ export const usePreferencesStore = create<PreferencesStore>((set) => ({
   setMetronomeBeatsPerNote: (beats) => {
     saveMetronomeBeatsPerNote(beats)
     set({ metronomeBeatsPerNote: beats })
+  },
+
+  setThemeOverride: (theme) => {
+    saveThemeOverride(theme)
+    set({ themeOverride: theme })
   },
 }))

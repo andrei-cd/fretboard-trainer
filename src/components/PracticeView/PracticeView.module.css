@@ -1,8 +1,15 @@
 .view {
   position: relative;
-  background: var(--surface);
+  background:
+    radial-gradient(
+      120% 120% at 50% -20%,
+      color-mix(in srgb, var(--accent) 8%, var(--surface)) 0%,
+      var(--surface) 60%
+    ),
+    var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   min-height: 420px;
   display: flex;
   align-items: center;
@@ -38,9 +45,15 @@
 }
 
 .noteLabel {
-  font-size: 120px;
+  font-family: var(--font-display);
+  font-size: clamp(96px, 18vw, 180px);
   font-weight: 700;
   line-height: 1;
+  background: var(--accent-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 4px 20px color-mix(in srgb, var(--accent) 35%, transparent));
 }
 
 .timerRing {
@@ -57,18 +70,28 @@
 }
 
 .nextButton {
-  padding: 10px 28px;
-  border-radius: 8px;
-  border: 1px solid var(--accent);
-  background: var(--accent);
+  padding: 11px 30px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent-gradient);
   color: var(--accent-contrast);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: var(--shadow-glow);
+  transition:
+    transform 150ms ease,
+    filter 150ms ease;
 }
 
 .nextButton:hover {
   filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.nextButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .micStatus {
@@ -129,7 +152,8 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: currentColor;
+  background: var(--accent-gradient);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 50%, transparent);
   animation: pulse 1.2s ease-in-out infinite;
 }
 
@@ -155,14 +179,27 @@
 }
 
 .startButton {
-  padding: 10px 28px;
-  border-radius: 8px;
-  border: 1px solid var(--accent);
+  padding: 11px 30px;
+  border-radius: 999px;
+  border: 1.5px solid var(--accent);
   background: transparent;
   color: var(--accent);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
+  transition:
+    background 150ms ease,
+    transform 150ms ease;
+}
+
+.startButton:hover {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  transform: translateY(-1px);
+}
+
+.startButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .statsLink {
@@ -194,7 +231,8 @@
 }
 
 .metronomeDot[data-accent='true'] {
-  background: var(--accent);
+  background: var(--accent-gradient);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 50%, transparent);
   width: 16px;
   height: 16px;
 }

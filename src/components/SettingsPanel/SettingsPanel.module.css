@@ -1,12 +1,95 @@
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Accordion section */
+
+.section {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
+
+.sectionHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.sectionHeader:hover {
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+.sectionHeader:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.chevron {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+  transition:
+    transform 200ms ease,
+    color 200ms ease;
+}
+
+.section[data-open='true'] .chevron {
+  transform: rotate(180deg);
+  color: var(--accent);
+}
+
+.sectionBody {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 220ms ease;
+}
+
+.section[data-open='true'] .sectionBody {
+  grid-template-rows: 1fr;
+}
+
+.sectionBodyInner {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow: hidden;
+  min-height: 0;
+  padding: 0 18px 18px;
+}
+
+/* Shared field chrome */
 
 .fieldset {
   border: none;
@@ -33,19 +116,32 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  padding: 8px;
+  padding: 10px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease;
+}
+
+.modeOption:hover {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
 }
 
 .modeOption[data-active='true'] {
   border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 14%, transparent),
+    color-mix(in srgb, var(--accent-2) 10%, transparent)
+  );
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent) inset;
 }
 
 .modeOption input {
   margin-top: 3px;
+  accent-color: var(--accent);
 }
 
 .modeText {
@@ -54,6 +150,7 @@
 }
 
 .modeLabel {
+  font-family: var(--font-display);
   font-weight: 600;
   font-size: 14px;
 }
@@ -75,6 +172,10 @@
   gap: 6px;
   font-size: 14px;
   cursor: pointer;
+}
+
+.checkboxOption input {
+  accent-color: var(--accent);
 }
 
 .accidentalList {
@@ -112,6 +213,10 @@
   background: var(--surface);
   color: var(--text);
   cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    color 150ms ease;
 }
 
 .inlineActions button:hover {
@@ -120,8 +225,13 @@
 
 .inlineActions button[data-active='true'] {
   border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 14%, transparent),
+    color-mix(in srgb, var(--accent-2) 10%, transparent)
+  );
   color: var(--accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent) inset;
 }
 
 .timerRow {
@@ -161,6 +271,7 @@
   color: var(--text-muted);
   cursor: pointer;
   text-align: center;
+  transition: color 150ms ease;
 }
 
 .sensitivityTick:first-child {

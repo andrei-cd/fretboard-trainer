@@ -64,3 +64,11 @@ export function loadMetronomeBeatsPerNote(): number {
 export function saveMetronomeBeatsPerNote(beats: number): void {
   saveState({ ...loadState(), metronomeBeatsPerNote: beats })
 }
+
+export function loadThemeOverride(): 'light' | 'dark' | null {
+  return loadState().themeOverride ?? null
+}
+
+export function saveThemeOverride(theme: 'light' | 'dark'): void {
+  saveState({ ...loadState(), themeOverride: theme })
+}

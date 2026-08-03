@@ -18,7 +18,7 @@ export function MetronomeSettings() {
 
   return (
     <fieldset className={styles.fieldset}>
-      <legend>Metronome</legend>
+      <legend className={styles.srOnly}>Metronome</legend>
       <label className={styles.checkboxOption}>
         <input
           type="checkbox"

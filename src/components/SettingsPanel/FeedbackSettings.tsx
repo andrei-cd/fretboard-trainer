@@ -9,7 +9,7 @@ export function FeedbackSettings() {
 
   return (
     <fieldset className={styles.fieldset}>
-      <legend>Feedback (Microphone / Adaptive modes)</legend>
+      <legend className={styles.srOnly}>Feedback (Microphone / Adaptive modes)</legend>
       <label className={styles.checkboxOption}>
         <input
           type="checkbox"

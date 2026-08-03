@@ -22,7 +22,7 @@ export function MicSettings() {
 
   return (
     <fieldset className={styles.fieldset}>
-      <legend>Microphone sensitivity</legend>
+      <legend className={styles.srOnly}>Microphone sensitivity</legend>
       <input
         type="range"
         className={styles.sensitivitySlider}

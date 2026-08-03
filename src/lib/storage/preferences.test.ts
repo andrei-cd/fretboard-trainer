@@ -8,6 +8,7 @@ import {
   loadMetronomeLockToTimer,
   loadMicSensitivity,
   loadSoundEnabled,
+  loadThemeOverride,
   saveFeedbackMessagesEnabled,
   saveMergeAccidentalSpellingsEnabled,
   saveMetronomeBeatsPerNote,
@@ -16,6 +17,7 @@ import {
   saveMetronomeLockToTimer,
   saveMicSensitivity,
   saveSoundEnabled,
+  saveThemeOverride,
 } from './preferences'
 
 beforeEach(() => {
@@ -131,5 +133,29 @@ describe('metronome preference persistence', () => {
     const raw = JSON.parse(localStorage.getItem('music-note:v1')!)
     expect(raw.adaptiveStats['E:C']).toEqual({ avgResponseTimeMs: 1000, sampleCount: 1 })
     expect(raw.metronomeEnabled).toBe(true)
+  })
+})
+
+describe('theme override preference persistence', () => {
+  it('defaults to null when nothing has been saved yet, unlike other prefs with a concrete default', () => {
+    expect(loadThemeOverride()).toBeNull()
+  })
+
+  it('round-trips a saved value through localStorage', () => {
+    saveThemeOverride('dark')
+    expect(loadThemeOverride()).toBe('dark')
+    saveThemeOverride('light')
+    expect(loadThemeOverride()).toBe('light')
+  })
+
+  it('does not clobber adaptive stats when saving the theme preference', () => {
+    localStorage.setItem(
+      'music-note:v1',
+      JSON.stringify({ version: 1, adaptiveStats: { 'E:C': { avgResponseTimeMs: 1000, sampleCount: 1 } } }),
+    )
+    saveThemeOverride('dark')
+    const raw = JSON.parse(localStorage.getItem('music-note:v1')!)
+    expect(raw.adaptiveStats['E:C']).toEqual({ avgResponseTimeMs: 1000, sampleCount: 1 })
+    expect(raw.themeOverride).toBe('dark')
   })
 })
