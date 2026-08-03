@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useSessionStore } from '../../store/sessionStore'
 import { ManualPracticeView } from './ManualPracticeView'
 import { MicPracticeView } from './MicPracticeView'
+import { MetronomeIndicator } from './MetronomeIndicator'
 import styles from './PracticeView.module.css'
 
 export function PracticeView() {
@@ -20,5 +21,10 @@ export function PracticeView() {
 
   const isMicMode = mode === 'mic' || mode === 'adaptive'
 
-  return <div className={styles.view}>{isMicMode ? <MicPracticeView /> : <ManualPracticeView />}</div>
+  return (
+    <div className={styles.view}>
+      <MetronomeIndicator />
+      {isMicMode ? <MicPracticeView /> : <ManualPracticeView />}
+    </div>
+  )
 }

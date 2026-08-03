@@ -1,10 +1,4 @@
-let sharedContext: AudioContext | null = null
-
-function getAudioContext(): AudioContext {
-  if (!sharedContext) sharedContext = new AudioContext()
-  if (sharedContext.state === 'suspended') void sharedContext.resume()
-  return sharedContext
-}
+import { getAudioContext } from './audioContext'
 
 /** Plays a short, soft tone starting `startOffset` seconds from now. */
 function playTone(

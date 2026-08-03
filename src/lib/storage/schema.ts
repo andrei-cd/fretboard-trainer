@@ -13,6 +13,14 @@ export interface PersistedSchemaV1 {
   micSensitivity?: MicSensitivity
   /** Undefined on data saved before this preference existed — treat as enabled (default true). */
   mergeAccidentalSpellingsEnabled?: boolean
+  /** Undefined on data saved before this preference existed — treat as disabled (default false). */
+  metronomeEnabled?: boolean
+  /** Undefined on data saved before this preference existed — treat as 100. */
+  metronomeBpm?: number
+  /** Undefined on data saved before this preference existed — treat as disabled (default false). */
+  metronomeLockToTimer?: boolean
+  /** Undefined on data saved before this preference existed — treat as 4. */
+  metronomeBeatsPerNote?: number
   lastSessionConfig?: SessionConfig
 }
 

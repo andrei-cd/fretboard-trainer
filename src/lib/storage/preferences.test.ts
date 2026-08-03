@@ -2,10 +2,18 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import {
   loadFeedbackMessagesEnabled,
   loadMergeAccidentalSpellingsEnabled,
+  loadMetronomeBeatsPerNote,
+  loadMetronomeBpm,
+  loadMetronomeEnabled,
+  loadMetronomeLockToTimer,
   loadMicSensitivity,
   loadSoundEnabled,
   saveFeedbackMessagesEnabled,
   saveMergeAccidentalSpellingsEnabled,
+  saveMetronomeBeatsPerNote,
+  saveMetronomeBpm,
+  saveMetronomeEnabled,
+  saveMetronomeLockToTimer,
   saveMicSensitivity,
   saveSoundEnabled,
 } from './preferences'
@@ -92,5 +100,36 @@ describe('merge accidental spellings preference persistence', () => {
     expect(loadMergeAccidentalSpellingsEnabled()).toBe(false)
     saveMergeAccidentalSpellingsEnabled(true)
     expect(loadMergeAccidentalSpellingsEnabled()).toBe(true)
+  })
+})
+
+describe('metronome preference persistence', () => {
+  it('defaults to disabled, 100 bpm, unlocked, 4 beats per note', () => {
+    expect(loadMetronomeEnabled()).toBe(false)
+    expect(loadMetronomeBpm()).toBe(100)
+    expect(loadMetronomeLockToTimer()).toBe(false)
+    expect(loadMetronomeBeatsPerNote()).toBe(4)
+  })
+
+  it('round-trips saved values through localStorage', () => {
+    saveMetronomeEnabled(true)
+    saveMetronomeBpm(120)
+    saveMetronomeLockToTimer(true)
+    saveMetronomeBeatsPerNote(8)
+    expect(loadMetronomeEnabled()).toBe(true)
+    expect(loadMetronomeBpm()).toBe(120)
+    expect(loadMetronomeLockToTimer()).toBe(true)
+    expect(loadMetronomeBeatsPerNote()).toBe(8)
+  })
+
+  it('does not clobber adaptive stats when saving metronome preferences', () => {
+    localStorage.setItem(
+      'music-note:v1',
+      JSON.stringify({ version: 1, adaptiveStats: { 'E:C': { avgResponseTimeMs: 1000, sampleCount: 1 } } }),
+    )
+    saveMetronomeEnabled(true)
+    const raw = JSON.parse(localStorage.getItem('music-note:v1')!)
+    expect(raw.adaptiveStats['E:C']).toEqual({ avgResponseTimeMs: 1000, sampleCount: 1 })
+    expect(raw.metronomeEnabled).toBe(true)
   })
 })

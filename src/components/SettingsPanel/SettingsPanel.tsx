@@ -3,6 +3,7 @@ import { ModeSelector } from './ModeSelector'
 import { StringSelector } from './StringSelector'
 import { NoteSelector } from './NoteSelector'
 import { TimerConfig } from './TimerConfig'
+import { MetronomeSettings } from './MetronomeSettings'
 import { FeedbackSettings } from './FeedbackSettings'
 import { MicSettings } from './MicSettings'
 import styles from './SettingsPanel.module.css'
@@ -17,6 +18,7 @@ export function SettingsPanel() {
       <StringSelector />
       <NoteSelector />
       <TimerConfig />
+      <MetronomeSettings />
       <FeedbackSettings />
       {usesMic && <MicSettings />}
     </div>

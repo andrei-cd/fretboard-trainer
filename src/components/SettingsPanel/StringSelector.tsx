@@ -23,6 +23,10 @@ export function StringSelector() {
     setConfig({ selectedStrings: next })
   }
 
+  function selectAll() {
+    setConfig({ selectedStrings: [...STRING_NAMES] })
+  }
+
   return (
     <fieldset className={styles.fieldset}>
       <legend>Strings</legend>
@@ -33,6 +37,11 @@ export function StringSelector() {
             {STRING_LABELS[s]}
           </label>
         ))}
+      </div>
+      <div className={styles.inlineActions}>
+        <button type="button" onClick={selectAll}>
+          All
+        </button>
       </div>
     </fieldset>
   )

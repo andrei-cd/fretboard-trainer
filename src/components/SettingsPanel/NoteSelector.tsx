@@ -29,6 +29,18 @@ export function NoteSelector() {
     setConfig({ selectedNotes: [] });
   }
 
+  function selectNaturals() {
+    setConfig({ selectedNotes: [...NATURAL_NOTE_IDS] });
+  }
+
+  function selectSharps() {
+    setConfig({ selectedNotes: ACCIDENTAL_NOTE_ID_PAIRS.map(([sharp]) => sharp) });
+  }
+
+  function selectFlats() {
+    setConfig({ selectedNotes: ACCIDENTAL_NOTE_ID_PAIRS.map(([, flat]) => flat) });
+  }
+
   return (
     <fieldset className={styles.fieldset}>
       <legend>Notes</legend>
@@ -80,6 +92,17 @@ export function NoteSelector() {
         </button>
         <button type="button" onClick={selectNone}>
           None
+        </button>
+      </div>
+      <div className={styles.inlineActions}>
+        <button type="button" onClick={selectNaturals}>
+          Naturals
+        </button>
+        <button type="button" onClick={selectSharps}>
+          Sharps
+        </button>
+        <button type="button" onClick={selectFlats}>
+          Flats
         </button>
       </div>
     </fieldset>
