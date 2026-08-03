@@ -33,14 +33,16 @@ const MIN_PLAUSIBLE_HZ = 70
 const MAX_PLAUSIBLE_HZ = 1500
 
 /**
- * 'low' requires a louder, cleaner signal (fewer false positives from background noise, but
- * may miss quiet playing); 'high' picks up quieter/softer notes at the cost of being more
- * prone to false positives from ambient noise.
+ * The low end requires a louder, cleaner signal (fewer false positives from background noise,
+ * but may miss quiet playing); the high end picks up quieter/softer notes at the cost of being
+ * more prone to false positives from ambient noise.
  */
 export const MIC_SENSITIVITY_PRESETS: Record<MicSensitivity, { minClarity: number; minVolumeDecibels: number }> = {
+  'very-low': { minClarity: 0.97, minVolumeDecibels: -30 },
   low: { minClarity: 0.95, minVolumeDecibels: -35 },
   medium: { minClarity: 0.92, minVolumeDecibels: -40 },
   high: { minClarity: 0.88, minVolumeDecibels: -45 },
+  'very-high': { minClarity: 0.84, minVolumeDecibels: -50 },
 }
 
 export function useMicPitch({
