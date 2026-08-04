@@ -7,15 +7,21 @@ interface SettingsSectionProps {
       current practice mode changes, until the user clicks the header — after that, their
       choice sticks for the rest of the session. */
   relevant: boolean
+  /** Spans the full grid width instead of sharing a row with other cards — for sections whose
+      content is tall enough that sharing a row with shorter cards would leave awkward gaps. */
+  fullWidth?: boolean
   children: ReactNode
 }
 
-export function SettingsSection({ title, relevant, children }: SettingsSectionProps) {
+export function SettingsSection({ title, relevant, fullWidth, children }: SettingsSectionProps) {
   const [override, setOverride] = useState<boolean | null>(null)
   const open = override ?? relevant
 
   return (
-    <section className={styles.section} data-open={open}>
+    <section
+      className={fullWidth ? `${styles.section} ${styles.sectionFullWidth}` : styles.section}
+      data-open={open}
+    >
       <button
         type="button"
         className={styles.sectionHeader}
@@ -28,7 +34,9 @@ export function SettingsSection({ title, relevant, children }: SettingsSectionPr
         </svg>
       </button>
       <div className={styles.sectionBody}>
-        <div className={styles.sectionBodyInner}>{children}</div>
+        <div className={styles.sectionBodyInner}>
+          <div className={styles.sectionBodyContent}>{children}</div>
+        </div>
       </div>
     </section>
   )

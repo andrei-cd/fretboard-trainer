@@ -23,7 +23,7 @@ export function MicPracticeView() {
   const [showStats, setShowStats] = useState(false)
   const [feedback, setFeedback] = useState<Feedback | null>(null)
 
-  const mode = useSessionStore((s) => s.config.mode)
+  const adaptiveEnabled = useSessionStore((s) => s.config.adaptiveEnabled)
   const fretRange = useSessionStore((s) => s.config.fretRange)
   const current = useSessionStore((s) => s.round.current)
   const roundStartedAt = useSessionStore((s) => s.round.roundStartedAt)
@@ -107,12 +107,12 @@ export function MicPracticeView() {
         />
       )}
       {feedback && <FeedbackBadge feedback={feedback} />}
-      {mode === 'adaptive' && (
+      {adaptiveEnabled && (
         <button type="button" className={styles.statsLink} onClick={() => setShowStats((v) => !v)}>
           {showStats ? 'Hide stats' : 'View stats'}
         </button>
       )}
-      {mode === 'adaptive' && showStats && <StatsView />}
+      {adaptiveEnabled && showStats && <StatsView />}
     </div>
   )
 }

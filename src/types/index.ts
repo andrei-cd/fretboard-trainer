@@ -1,4 +1,4 @@
-export type Mode = 'normal' | 'timer' | 'mic' | 'adaptive'
+export type Mode = 'normal' | 'timer' | 'mic'
 
 /**
  * How readily the mic picks up a note, 5 discrete steps low to high. Lower favors fewer false
@@ -44,6 +44,8 @@ export interface FretRange {
 
 export interface SessionConfig {
   mode: Mode
+  /** Only meaningful when mode === 'mic' — weights round selection toward weaker (string, note) pairs. */
+  adaptiveEnabled: boolean
   selectedStrings: StringName[]
   selectedNotes: NoteId[]
   fretRange: FretRange

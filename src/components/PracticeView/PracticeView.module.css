@@ -49,11 +49,8 @@
   font-size: clamp(96px, 18vw, 180px);
   font-weight: 700;
   line-height: 1;
-  background: var(--accent-gradient);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 4px 20px color-mix(in srgb, var(--accent) 35%, transparent));
+  color: var(--text);
+  filter: drop-shadow(0 4px 20px color-mix(in srgb, var(--text) 18%, transparent));
 }
 
 .timerRing {

@@ -53,8 +53,8 @@ export function StatsView() {
         </>
       ) : (
         <p className={styles.emptyState}>
-          No data yet — practice in Microphone or Adaptive mode and this fills in with your response
-          times per string and note.
+          No data yet — practice in Microphone mode with Adaptive enabled and this fills in with your
+          response times per string and note.
         </p>
       )}
     </div>

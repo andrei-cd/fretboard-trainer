@@ -19,7 +19,7 @@ export function PracticeView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, stringsKey, notesKey])
 
-  const isMicMode = mode === 'mic' || mode === 'adaptive'
+  const isMicMode = mode === 'mic'
 
   return (
     <div className={styles.view}>

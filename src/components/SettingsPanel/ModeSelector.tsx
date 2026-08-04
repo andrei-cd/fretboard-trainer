@@ -6,11 +6,11 @@ const MODES: { value: Mode; label: string; description: string }[] = [
   { value: 'normal', label: 'Normal', description: 'Random note, manual advance' },
   { value: 'timer', label: 'Timer', description: 'Random note, auto-advance on countdown' },
   { value: 'mic', label: 'Microphone', description: 'Advances when you play the right note' },
-  { value: 'adaptive', label: 'Adaptive', description: 'Microphone mode, favors your weak notes' },
 ]
 
 export function ModeSelector() {
   const mode = useSessionStore((s) => s.config.mode)
+  const adaptiveEnabled = useSessionStore((s) => s.config.adaptiveEnabled)
   const setConfig = useSessionStore((s) => s.setConfig)
 
   return (
@@ -32,6 +32,19 @@ export function ModeSelector() {
             </span>
           </label>
         ))}
+        {mode === 'mic' && (
+          <label className={`${styles.modeOption} ${styles.adaptiveToggle}`} data-active={adaptiveEnabled}>
+            <input
+              type="checkbox"
+              checked={adaptiveEnabled}
+              onChange={(e) => setConfig({ adaptiveEnabled: e.target.checked })}
+            />
+            <span className={styles.modeText}>
+              <span className={styles.modeLabel}>Adaptive</span>
+              <span className={styles.modeDescription}>Favor notes you're slower or less accurate on</span>
+            </span>
+          </label>
+        )}
       </div>
     </fieldset>
   )

@@ -36,7 +36,7 @@ describe('sessionStore', () => {
     expect(useSessionStore.getState().round.current).toBeNull()
   })
 
-  it('uses weighted selection in adaptive mode', () => {
+  it('uses weighted selection when adaptive is enabled in mic mode', () => {
     // Three eligible notes on a single string so the no-repeat rule doesn't force a strict 50/50 alternation.
     useStatsStore.setState({
       stats: {
@@ -44,7 +44,9 @@ describe('sessionStore', () => {
         'E:C#': { avgResponseTimeMs: 300, sampleCount: 10 },
       },
     })
-    useSessionStore.getState().setConfig({ mode: 'adaptive', selectedStrings: ['E'], selectedNotes: ['C', 'C#', 'D'] })
+    useSessionStore
+      .getState()
+      .setConfig({ mode: 'mic', adaptiveEnabled: true, selectedStrings: ['E'], selectedNotes: ['C', 'C#', 'D'] })
     const counts = { C: 0, 'C#': 0, D: 0 } as Record<string, number>
     for (let i = 0; i < 600; i++) {
       useSessionStore.getState().nextRound()
@@ -54,7 +56,7 @@ describe('sessionStore', () => {
     expect(counts.C).toBeGreaterThan(counts.D)
   })
 
-  it('weights the same note differently on different strings in adaptive mode', () => {
+  it('weights the same note differently on different strings when adaptive is enabled', () => {
     // G is recorded as slow on the D string but fast on the E string.
     useStatsStore.setState({
       stats: {
@@ -62,7 +64,9 @@ describe('sessionStore', () => {
         'E:G': { avgResponseTimeMs: 500, sampleCount: 10 },
       },
     })
-    useSessionStore.getState().setConfig({ mode: 'adaptive', selectedStrings: ['E', 'D'], selectedNotes: ['G', 'C'] })
+    useSessionStore
+      .getState()
+      .setConfig({ mode: 'mic', adaptiveEnabled: true, selectedStrings: ['E', 'D'], selectedNotes: ['G', 'C'] })
     const counts = { 'D:G': 0, 'E:G': 0 } as Record<string, number>
     for (let i = 0; i < 600; i++) {
       useSessionStore.getState().nextRound()

@@ -20,6 +20,7 @@ interface SessionStore {
 
 export const DEFAULT_SESSION_CONFIG: SessionConfig = {
   mode: 'normal',
+  adaptiveEnabled: false,
   selectedStrings: [...STRING_NAMES],
   selectedNotes: [...DEFAULT_NOTE_IDS],
   fretRange: DEFAULT_FRET_RANGE,
@@ -36,7 +37,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
 
   nextRound: () => {
     const { config, round } = get()
-    const { selectedStrings, selectedNotes, fretRange, mode } = config
+    const { selectedStrings, selectedNotes, fretRange, mode, adaptiveEnabled } = config
 
     if (selectedStrings.length === 0 || selectedNotes.length === 0) {
       set({ round: { ...EMPTY_ROUND, previousPitchClass: round.previousPitchClass } })
@@ -46,7 +47,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     const mergeAccidentalSpellings = usePreferencesStore.getState().mergeAccidentalSpellingsEnabled
 
     const pick =
-      mode === 'adaptive'
+      mode === 'mic' && adaptiveEnabled
         ? pickWeightedRound(
             selectedStrings,
             selectedNotes,
