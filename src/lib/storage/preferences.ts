@@ -82,7 +82,7 @@ export function saveThemeOverride(theme: 'light' | 'dark'): void {
 }
 
 export function loadAppMode(): AppMode {
-  return loadState().appMode ?? 'recall'
+  return loadState().appMode ?? 'recognition'
 }
 
 export function saveAppMode(mode: AppMode): void {

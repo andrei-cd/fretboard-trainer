@@ -183,8 +183,8 @@ describe('theme override preference persistence', () => {
 })
 
 describe('app mode preference persistence', () => {
-  it('defaults to recall when nothing has been saved yet', () => {
-    expect(loadAppMode()).toBe('recall')
+  it('defaults to recognition when nothing has been saved yet', () => {
+    expect(loadAppMode()).toBe('recognition')
   })
 
   it('round-trips a saved value through localStorage', () => {

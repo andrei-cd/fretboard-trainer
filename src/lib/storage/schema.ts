@@ -34,7 +34,7 @@ export interface PersistedSchemaV1 {
       runtime instead. Once set, this explicit choice wins on all future visits. */
   themeOverride?: 'light' | 'dark'
   lastSessionConfig?: SessionConfig
-  /** Undefined on data saved before this preference existed — treat as 'recall'. */
+  /** Undefined on data saved before this preference existed — treat as 'recognition'. */
   appMode?: AppMode
   /** Undefined on data saved before this preference existed — treat as false. */
   recognitionLeftHand?: boolean

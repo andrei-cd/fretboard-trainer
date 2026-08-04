@@ -10,20 +10,20 @@ export function AppModeToggle() {
       <button
         type="button"
         className={styles.toggleButton}
-        data-active={appMode === 'recall'}
-        aria-pressed={appMode === 'recall'}
-        onClick={() => setAppMode('recall')}
-      >
-        Recall
-      </button>
-      <button
-        type="button"
-        className={styles.toggleButton}
         data-active={appMode === 'recognition'}
         aria-pressed={appMode === 'recognition'}
         onClick={() => setAppMode('recognition')}
       >
         Recognition
+      </button>
+      <button
+        type="button"
+        className={styles.toggleButton}
+        data-active={appMode === 'recall'}
+        aria-pressed={appMode === 'recall'}
+        onClick={() => setAppMode('recall')}
+      >
+        Recall
       </button>
     </div>
   )
