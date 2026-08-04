@@ -14,7 +14,12 @@ function App() {
     <div className={styles.app}>
       <header className={styles.header}>
         <div className={styles.brand}>
-          <img src="/favicon.svg" alt="" className={styles.logo} aria-hidden="true" />
+          <img
+            src={`${import.meta.env.BASE_URL}favicon.svg`}
+            alt=""
+            className={styles.logo}
+            aria-hidden="true"
+          />
           <h1>Fretboard Trainer</h1>
         </div>
         <div className={styles.headerControls}>
