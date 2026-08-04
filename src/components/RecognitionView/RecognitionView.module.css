@@ -14,7 +14,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* Top-aligned on purpose: centering here would re-center the whole block whenever the
+     feedback message adds height below the grid, shifting the fretboard/grid upward. Top
+     alignment keeps them pinned in place — the card just grows downward instead. */
+  justify-content: flex-start;
   gap: 24px;
   padding: 24px;
 }
