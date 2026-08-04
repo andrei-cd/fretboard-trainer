@@ -39,7 +39,7 @@
 .progress {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 26px;
   margin: 0;
   color: var(--text-muted);
   font-size: 14px;
@@ -48,12 +48,13 @@
 .progressCount {
   color: var(--text);
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 700;
 }
 
 .progressPercentage {
   white-space: nowrap;
+  font-size: 18px;
 }
 
 .resetProgressButton {
@@ -67,7 +68,10 @@
   padding: 5px 10px;
   font: inherit;
   font-size: 12px;
-  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+  transition:
+    border-color 150ms ease,
+    color 150ms ease,
+    background 150ms ease;
 }
 
 .resetProgressButton:hover {
@@ -150,7 +154,11 @@
 .answerButtonIncorrect,
 .answerButtonIncorrect:disabled {
   border-color: var(--danger);
-  background: linear-gradient(135deg, var(--danger), color-mix(in srgb, var(--danger) 62%, #5a1010));
+  background: linear-gradient(
+    135deg,
+    var(--danger),
+    color-mix(in srgb, var(--danger) 62%, #5a1010)
+  );
   color: #fff;
   opacity: 1;
 }

@@ -119,7 +119,7 @@ export function RecognitionView() {
           />
           {feedback && (
             <div className={styles.feedbackFloating}>
-              <FeedbackBadge feedback={feedback} verb="picked" />
+              <FeedbackBadge feedback={feedback} conciseError />
             </div>
           )}
         </div>

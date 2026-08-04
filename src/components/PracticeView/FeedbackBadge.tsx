@@ -6,9 +6,11 @@ interface FeedbackBadgeProps {
   feedback: Feedback
   /** How the wrong note was produced — "played" (mic-detected) or "picked" (clicked). */
   verb?: string
+  /** Use a concise error message when the attempted label is not useful feedback. */
+  conciseError?: boolean
 }
 
-export function FeedbackBadge({ feedback, verb = 'played' }: FeedbackBadgeProps) {
+export function FeedbackBadge({ feedback, verb = 'played', conciseError = false }: FeedbackBadgeProps) {
   if (feedback.kind === 'success') {
     return (
       <div className={styles.feedbackBadge} data-kind="success" role="status">
@@ -19,7 +21,7 @@ export function FeedbackBadge({ feedback, verb = 'played' }: FeedbackBadgeProps)
 
   return (
     <div className={styles.feedbackBadge} data-kind="error" role="status">
-      ✗ You {verb} {feedback.playedLabel}
+      {conciseError ? '✗ Incorrect!' : `✗ You ${verb} ${feedback.playedLabel}`}
     </div>
   )
 }
