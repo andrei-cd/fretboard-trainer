@@ -23,12 +23,44 @@
   width: 100%;
 }
 
+.answerArea {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.answerGridWrap {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+}
+
 .answerGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 8px;
   width: 100%;
-  max-width: 560px;
+}
+
+/* Absolutely positioned so it never affects the grid's layout/centering — appearing and
+   disappearing must not shift the grid. */
+.feedbackFloating {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translate(16px, -50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .feedbackFloating {
+    position: static;
+    transform: none;
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+    white-space: normal;
+  }
 }
 
 .answerButton {

@@ -27,8 +27,12 @@ export function Fretboard({ fretCount, leftHand, labelMode, showMarkers, highlig
   const showStringLabels = labelMode === 'frets-strings' || labelMode === 'strings-only'
   const showFretLabels = labelMode === 'frets-strings' || labelMode === 'frets-only'
 
-  const stringLabelWidth = showStringLabels ? 40 : 12
-  const fretLabelHeight = showFretLabels ? 28 : 8
+  // Wide enough that the highlighted dot on an open string (which sits right on the nut
+  // line) can't reach the string label sitting just outside the board.
+  const stringLabelWidth = showStringLabels ? 46 : 12
+  // Tall enough that the highlighted dot on the bottom string can't reach up into the
+  // fret number row below the board.
+  const fretLabelHeight = showFretLabels ? 46 : 8
 
   // String labels sit next to the nut, which moves sides in left-hand mode — so the wider
   // margin needs to follow the nut rather than always sitting on the left.
@@ -38,6 +42,7 @@ export function Fretboard({ fretCount, leftHand, labelMode, showMarkers, highlig
   const boardBottom = VIEW_HEIGHT - fretLabelHeight
   const boardWidth = boardRight - boardLeft
   const stringGap = (boardBottom - boardTop) / (ROWS.length - 1)
+  const dotRadius = 11
 
   /** Real scale-length taper: fret spacing narrows toward the body, all within a fixed board width. */
   function rawFretOffset(fret: number): number {
@@ -58,6 +63,13 @@ export function Fretboard({ fretCount, leftHand, labelMode, showMarkers, highlig
   function stringY(stringName: StringName): number {
     return boardTop + ROWS.indexOf(stringName) * stringGap
   }
+
+  // Shrinks fret-number text to fit the narrowest fret gap — spacing tapers toward the
+  // highest frets (real scale-length behavior), so without this, dense high fret counts
+  // (e.g. 20-24) would render overlapping labels.
+  const tightestFretGap = fretCount >= 2 ? Math.abs(fretX(fretCount) - fretX(fretCount - 1)) : boardWidth
+  const fretLabelDigits = String(fretCount).length
+  const fretLabelFontSize = Math.max(9, Math.min(20, (tightestFretGap * 0.85) / (fretLabelDigits * 0.62)))
 
   const markerCenterY = (boardTop + boardBottom) / 2
   const markerOffsetY = (boardBottom - boardTop) * 0.2
@@ -116,7 +128,7 @@ export function Fretboard({ fretCount, leftHand, labelMode, showMarkers, highlig
           <text
             key={stringName}
             className={styles.stringLabel}
-            x={leftHand ? boardRight + 12 : boardLeft - 12}
+            x={leftHand ? boardRight + 18 : boardLeft - 18}
             y={stringY(stringName)}
             textAnchor={leftHand ? 'start' : 'end'}
             dominantBaseline="middle"
@@ -127,12 +139,19 @@ export function Fretboard({ fretCount, leftHand, labelMode, showMarkers, highlig
 
       {showFretLabels &&
         Array.from({ length: fretCount }, (_, i) => i + 1).map((fret) => (
-          <text key={fret} className={styles.fretLabel} x={dotX(fret)} y={boardBottom + 20} textAnchor="middle">
+          <text
+            key={fret}
+            className={styles.fretLabel}
+            x={dotX(fret)}
+            y={boardBottom + 34}
+            textAnchor="middle"
+            style={{ fontSize: fretLabelFontSize }}
+          >
             {fret}
           </text>
         ))}
 
-      {highlightPos && <circle className={styles.highlight} cx={highlightPos.x} cy={highlightPos.y} r={11} />}
+      {highlightPos && <circle className={styles.highlight} cx={highlightPos.x} cy={highlightPos.y} r={dotRadius} />}
     </svg>
   )
 }

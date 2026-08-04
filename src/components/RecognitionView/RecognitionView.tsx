@@ -83,8 +83,16 @@ export function RecognitionView() {
           highlighted={current ? { stringName: current.stringName, fret: current.fret } : null}
         />
       </div>
-      {feedback && <FeedbackBadge feedback={feedback} verb="picked" />}
-      <NoteAnswerGrid format={config.noteNameFormat} disabled={!current || locked} onAnswer={handleAnswer} />
+      <div className={styles.answerArea}>
+        <div className={styles.answerGridWrap}>
+          <NoteAnswerGrid format={config.noteNameFormat} disabled={!current || locked} onAnswer={handleAnswer} />
+          {feedback && (
+            <div className={styles.feedbackFloating}>
+              <FeedbackBadge feedback={feedback} verb="picked" />
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
