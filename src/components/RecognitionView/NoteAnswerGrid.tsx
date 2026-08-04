@@ -5,6 +5,7 @@ import styles from './RecognitionView.module.css'
 interface NoteAnswerGridProps {
   format: NoteNameFormat
   disabled: boolean
+  incorrectAnswers: ReadonlySet<NoteId>
   onAnswer: (noteId: NoteId) => void
 }
 
@@ -16,10 +17,12 @@ const NATURAL_TO_ACCIDENTAL_PAIR = new Map<NoteId, [NoteId, NoteId]>(
 function AnswerRow({
   cells,
   disabled,
+  incorrectAnswers,
   onAnswer,
 }: {
   cells: (NoteId | null)[]
   disabled: boolean
+  incorrectAnswers: ReadonlySet<NoteId>
   onAnswer: (noteId: NoteId) => void
 }) {
   return (
@@ -29,8 +32,8 @@ function AnswerRow({
           <button
             key={noteId}
             type="button"
-            className={styles.answerButton}
-            disabled={disabled}
+            className={`${styles.answerButton} ${incorrectAnswers.has(noteId) ? styles.answerButtonIncorrect : ''}`}
+            disabled={disabled || incorrectAnswers.has(noteId)}
             onClick={() => onAnswer(noteId)}
           >
             {noteId}
@@ -43,18 +46,23 @@ function AnswerRow({
   )
 }
 
-export function NoteAnswerGrid({ format, disabled, onAnswer }: NoteAnswerGridProps) {
+export function NoteAnswerGrid({ format, disabled, incorrectAnswers, onAnswer }: NoteAnswerGridProps) {
   const sharpCells = NATURAL_NOTE_IDS.map((natural) => NATURAL_TO_ACCIDENTAL_PAIR.get(natural)?.[0] ?? null)
   const flatCells = NATURAL_NOTE_IDS.map((natural) => NATURAL_TO_ACCIDENTAL_PAIR.get(natural)?.[1] ?? null)
 
   return (
     <div className={styles.answerGrid} role="group" aria-label="Note names">
       {(format === 'sharps' || format === 'both') && (
-        <AnswerRow cells={sharpCells} disabled={disabled} onAnswer={onAnswer} />
+        <AnswerRow cells={sharpCells} disabled={disabled} incorrectAnswers={incorrectAnswers} onAnswer={onAnswer} />
       )}
-      <AnswerRow cells={[...NATURAL_NOTE_IDS]} disabled={disabled} onAnswer={onAnswer} />
+      <AnswerRow
+        cells={[...NATURAL_NOTE_IDS]}
+        disabled={disabled}
+        incorrectAnswers={incorrectAnswers}
+        onAnswer={onAnswer}
+      />
       {(format === 'flats' || format === 'both') && (
-        <AnswerRow cells={flatCells} disabled={disabled} onAnswer={onAnswer} />
+        <AnswerRow cells={flatCells} disabled={disabled} incorrectAnswers={incorrectAnswers} onAnswer={onAnswer} />
       )}
     </div>
   )

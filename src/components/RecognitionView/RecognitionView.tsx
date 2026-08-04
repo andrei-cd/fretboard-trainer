@@ -17,6 +17,9 @@ const ERROR_FEEDBACK_MS = 2200
 export function RecognitionView() {
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [locked, setLocked] = useState(false)
+  const [incorrectAnswers, setIncorrectAnswers] = useState<Set<NoteId>>(new Set())
+  const [correctAnswers, setCorrectAnswers] = useState(0)
+  const [attempts, setAttempts] = useState(0)
 
   const config = useRecognitionStore((s) => s.config)
   const current = useRecognitionStore((s) => s.round.current)
@@ -37,6 +40,7 @@ export function RecognitionView() {
   useEffect(() => {
     setFeedback(null)
     setLocked(false)
+    setIncorrectAnswers(new Set())
     if (feedbackTimeoutRef.current !== null) {
       clearTimeout(feedbackTimeoutRef.current)
       feedbackTimeoutRef.current = null
@@ -53,8 +57,11 @@ export function RecognitionView() {
   function handleAnswer(noteId: NoteId) {
     if (!current || locked) return
 
+    setAttempts((count) => count + 1)
+
     if (noteIdToPitchClass(noteId) === current.pitchClass) {
       setLocked(true)
+      setCorrectAnswers((count) => count + 1)
       if (soundEnabled) playSuccessSound()
       if (feedbackMessagesEnabled) {
         setFeedback({ kind: 'success' })
@@ -65,6 +72,7 @@ export function RecognitionView() {
       return
     }
 
+    setIncorrectAnswers((answers) => new Set(answers).add(noteId))
     if (soundEnabled) playErrorSound()
     if (feedbackMessagesEnabled) {
       setFeedback({ kind: 'error', playedLabel: noteId })
@@ -72,8 +80,26 @@ export function RecognitionView() {
     }
   }
 
+  const correctPercentage = attempts === 0 ? 0 : Math.round((correctAnswers / attempts) * 100)
+
   return (
     <div className={styles.view}>
+      <div className={styles.progressBar}>
+        <p className={styles.progress} aria-live="polite">
+          <span className={styles.progressCount}>{correctAnswers}/{attempts}</span>
+          <span className={styles.progressPercentage}>{correctPercentage}% correct</span>
+        </p>
+        <button
+          type="button"
+          className={styles.resetProgressButton}
+          onClick={() => {
+            setCorrectAnswers(0)
+            setAttempts(0)
+          }}
+        >
+          Reset
+        </button>
+      </div>
       <div className={styles.fretboardWrap}>
         <Fretboard
           fretCount={config.fretCount}
@@ -85,7 +111,12 @@ export function RecognitionView() {
       </div>
       <div className={styles.answerArea}>
         <div className={styles.answerGridWrap}>
-          <NoteAnswerGrid format={config.noteNameFormat} disabled={!current || locked} onAnswer={handleAnswer} />
+          <NoteAnswerGrid
+            format={config.noteNameFormat}
+            disabled={!current || locked}
+            incorrectAnswers={incorrectAnswers}
+            onAnswer={handleAnswer}
+          />
           {feedback && (
             <div className={styles.feedbackFloating}>
               <FeedbackBadge feedback={feedback} verb="picked" />
