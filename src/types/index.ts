@@ -1,5 +1,14 @@
 export type Mode = 'normal' | 'timer' | 'mic'
 
+/** Which top-level practice experience is active: text/mic-based recall vs visual fretboard recognition. */
+export type AppMode = 'recall' | 'recognition'
+
+/** Which text labels render around the Recognition fretboard diagram. */
+export type FretboardLabelMode = 'frets-strings' | 'frets-only' | 'strings-only' | 'none'
+
+/** Accidental spelling(s) shown on the Recognition answer grid — a display choice, independent of which pitch classes are quizzable. */
+export type NoteNameFormat = 'sharps' | 'flats' | 'both'
+
 /**
  * How readily the mic picks up a note, 5 discrete steps low to high. Lower favors fewer false
  * positives from background noise (requires a louder, cleaner signal); higher favors picking up
@@ -61,6 +70,32 @@ export interface RoundPick {
 export interface RoundState {
   current: RoundPick | null
   /** Underlying sound of the previous round, used to block an immediate repeat even across enharmonic spellings. */
+  previousPitchClass: PitchClass | null
+  roundStartedAt: number | null
+}
+
+export interface RecognitionConfig {
+  leftHand: boolean
+  /** Highest fret shown on the diagram; the open string (fret 0) is always included. */
+  fretCount: number
+  labelMode: FretboardLabelMode
+  noteNameFormat: NoteNameFormat
+  showFretMarkers: boolean
+  selectedStrings: StringName[]
+  /** When false, every pitch class is eligible and `selectedNotes` is ignored. */
+  noteFilterEnabled: boolean
+  selectedNotes: NoteId[]
+}
+
+/** A quiz target position — a raw fretboard cell, not a note spelling (spelling is an answer-grid display concern). */
+export interface RecognitionRoundPick {
+  stringName: StringName
+  fret: number
+  pitchClass: PitchClass
+}
+
+export interface RecognitionRoundState {
+  current: RecognitionRoundPick | null
   previousPitchClass: PitchClass | null
   roundStartedAt: number | null
 }

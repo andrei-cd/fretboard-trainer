@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
+  loadAppMode,
   loadFeedbackMessagesEnabled,
   loadMergeAccidentalSpellingsEnabled,
   loadMetronomeBeatsPerNote,
@@ -7,8 +8,19 @@ import {
   loadMetronomeEnabled,
   loadMetronomeLockToTimer,
   loadMicSensitivity,
+  loadRecognitionFeedbackMessagesEnabled,
+  loadRecognitionFretCount,
+  loadRecognitionLabelMode,
+  loadRecognitionLeftHand,
+  loadRecognitionNoteFilterEnabled,
+  loadRecognitionNoteNameFormat,
+  loadRecognitionSelectedNotes,
+  loadRecognitionSelectedStrings,
+  loadRecognitionShowFretMarkers,
+  loadRecognitionSoundEnabled,
   loadSoundEnabled,
   loadThemeOverride,
+  saveAppMode,
   saveFeedbackMessagesEnabled,
   saveMergeAccidentalSpellingsEnabled,
   saveMetronomeBeatsPerNote,
@@ -16,6 +28,16 @@ import {
   saveMetronomeEnabled,
   saveMetronomeLockToTimer,
   saveMicSensitivity,
+  saveRecognitionFeedbackMessagesEnabled,
+  saveRecognitionFretCount,
+  saveRecognitionLabelMode,
+  saveRecognitionLeftHand,
+  saveRecognitionNoteFilterEnabled,
+  saveRecognitionNoteNameFormat,
+  saveRecognitionSelectedNotes,
+  saveRecognitionSelectedStrings,
+  saveRecognitionShowFretMarkers,
+  saveRecognitionSoundEnabled,
   saveSoundEnabled,
   saveThemeOverride,
 } from './preferences'
@@ -157,5 +179,70 @@ describe('theme override preference persistence', () => {
     const raw = JSON.parse(localStorage.getItem('music-note:v1')!)
     expect(raw.adaptiveStats['E:C']).toEqual({ avgResponseTimeMs: 1000, sampleCount: 1 })
     expect(raw.themeOverride).toBe('dark')
+  })
+})
+
+describe('app mode preference persistence', () => {
+  it('defaults to recall when nothing has been saved yet', () => {
+    expect(loadAppMode()).toBe('recall')
+  })
+
+  it('round-trips a saved value through localStorage', () => {
+    saveAppMode('recognition')
+    expect(loadAppMode()).toBe('recognition')
+    saveAppMode('recall')
+    expect(loadAppMode()).toBe('recall')
+  })
+})
+
+describe('recognition preference persistence', () => {
+  it('defaults every field when nothing has been saved yet', () => {
+    expect(loadRecognitionLeftHand()).toBe(false)
+    expect(loadRecognitionFretCount()).toBe(12)
+    expect(loadRecognitionLabelMode()).toBe('frets-strings')
+    expect(loadRecognitionNoteNameFormat()).toBe('both')
+    expect(loadRecognitionShowFretMarkers()).toBe(true)
+    expect(loadRecognitionSelectedStrings()).toEqual(['E', 'A', 'D', 'G', 'B', 'e'])
+    expect(loadRecognitionNoteFilterEnabled()).toBe(false)
+    expect(loadRecognitionSelectedNotes().length).toBeGreaterThan(0)
+    expect(loadRecognitionSoundEnabled()).toBe(true)
+    expect(loadRecognitionFeedbackMessagesEnabled()).toBe(true)
+  })
+
+  it('round-trips saved values through localStorage', () => {
+    saveRecognitionLeftHand(true)
+    saveRecognitionFretCount(15)
+    saveRecognitionLabelMode('strings-only')
+    saveRecognitionNoteNameFormat('flats')
+    saveRecognitionShowFretMarkers(false)
+    saveRecognitionSelectedStrings(['E', 'A'])
+    saveRecognitionNoteFilterEnabled(true)
+    saveRecognitionSelectedNotes(['C', 'G'])
+    saveRecognitionSoundEnabled(false)
+    saveRecognitionFeedbackMessagesEnabled(false)
+
+    expect(loadRecognitionLeftHand()).toBe(true)
+    expect(loadRecognitionFretCount()).toBe(15)
+    expect(loadRecognitionLabelMode()).toBe('strings-only')
+    expect(loadRecognitionNoteNameFormat()).toBe('flats')
+    expect(loadRecognitionShowFretMarkers()).toBe(false)
+    expect(loadRecognitionSelectedStrings()).toEqual(['E', 'A'])
+    expect(loadRecognitionNoteFilterEnabled()).toBe(true)
+    expect(loadRecognitionSelectedNotes()).toEqual(['C', 'G'])
+    expect(loadRecognitionSoundEnabled()).toBe(false)
+    expect(loadRecognitionFeedbackMessagesEnabled()).toBe(false)
+  })
+
+  it('does not clobber adaptive stats or Recall preferences when saving Recognition preferences', () => {
+    localStorage.setItem(
+      'music-note:v1',
+      JSON.stringify({ version: 1, adaptiveStats: { 'E:C': { avgResponseTimeMs: 1000, sampleCount: 1 } } }),
+    )
+    saveSoundEnabled(false)
+    saveRecognitionSoundEnabled(true)
+    const raw = JSON.parse(localStorage.getItem('music-note:v1')!)
+    expect(raw.adaptiveStats['E:C']).toEqual({ avgResponseTimeMs: 1000, sampleCount: 1 })
+    expect(raw.soundEnabled).toBe(false)
+    expect(raw.recognitionSoundEnabled).toBe(true)
   })
 })

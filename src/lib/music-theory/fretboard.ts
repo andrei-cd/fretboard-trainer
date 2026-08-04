@@ -34,6 +34,12 @@ export const STANDARD_TUNING_MIDI: Record<StringName, number> = {
 
 export const DEFAULT_FRET_RANGE: FretRange = { min: 0, max: 12 }
 
+/** Frets that get a single dot inlay on a standard fretboard diagram. */
+export const SINGLE_FRET_MARKERS: readonly number[] = [3, 5, 7, 9, 15, 17, 19, 21]
+
+/** Frets that get a double dot inlay (octave markers) on a standard fretboard diagram. */
+export const DOUBLE_FRET_MARKERS: readonly number[] = [12, 24]
+
 export function noteAtFret(stringName: StringName, fret: number): PitchClass {
   return (STANDARD_TUNING[stringName] + fret) % 12
 }

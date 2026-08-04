@@ -1,5 +1,13 @@
-import type { FretRange, NoteId, PairWeights, PitchClass, RoundPick, StringName } from '../../types'
-import { isNoteOnString } from './fretboard'
+import type {
+  FretRange,
+  NoteId,
+  PairWeights,
+  PitchClass,
+  RecognitionRoundPick,
+  RoundPick,
+  StringName,
+} from '../../types'
+import { noteAtFret, isNoteOnString } from './fretboard'
 import { noteIdToPitchClass } from './pitchClass'
 import { makeStatsKey } from './statsKey'
 
@@ -73,6 +81,31 @@ export function pickRandomRound(
   const { noteId, pitchClass } = pickRandomFrom(pickRandomFrom(groups))
   const stringName = pickRandomFrom(stringsForNoteId(strings, noteId, range))
   return { stringName, noteId, pitchClass }
+}
+
+/**
+ * Uniform-random pick of a (string, fret) position for Recognition, never repeating the
+ * previous position's sound back-to-back. Unlike pickRandomRound, there is no NoteId/spelling
+ * concept at this stage — spelling is purely an answer-display concern handled by the caller.
+ */
+export function pickRecognitionRound(
+  strings: StringName[],
+  range: FretRange,
+  eligiblePitchClasses: PitchClass[] | null,
+  previousPitchClass: PitchClass | null,
+): RecognitionRoundPick {
+  const cells: RecognitionRoundPick[] = []
+  for (const stringName of strings) {
+    for (let fret = range.min; fret <= range.max; fret++) {
+      const pitchClass = noteAtFret(stringName, fret)
+      if (eligiblePitchClasses === null || eligiblePitchClasses.includes(pitchClass)) {
+        cells.push({ stringName, fret, pitchClass })
+      }
+    }
+  }
+  assertReachable(cells)
+  const candidates = excludingPreviousPitch(cells, previousPitchClass)
+  return pickRandomFrom(candidates)
 }
 
 /** Every (string, note) pair actually playable, given the current selection and fret range. */

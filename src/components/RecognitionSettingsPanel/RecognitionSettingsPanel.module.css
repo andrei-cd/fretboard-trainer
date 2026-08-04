@@ -1,0 +1,52 @@
+.settingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  gap: 8px;
+}
+
+.settingLabel {
+  color: var(--text);
+}
+
+.settingValue {
+  color: var(--text-muted);
+}
+
+.segmentedGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.segmentedButton {
+  flex: 1;
+  min-width: 100px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    color 150ms ease;
+}
+
+.segmentedButton:hover {
+  border-color: var(--accent);
+}
+
+.segmentedButton[data-active='true'] {
+  border-color: var(--accent);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 14%, transparent),
+    color-mix(in srgb, var(--accent-2) 10%, transparent)
+  );
+  color: var(--accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent) inset;
+}

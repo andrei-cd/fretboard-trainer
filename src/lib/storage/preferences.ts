@@ -1,4 +1,12 @@
-import type { MicSensitivity } from '../../types'
+import type {
+  AppMode,
+  FretboardLabelMode,
+  MicSensitivity,
+  NoteId,
+  NoteNameFormat,
+  StringName,
+} from '../../types'
+import { DEFAULT_NOTE_IDS, STRING_NAMES } from '../music-theory'
 import { loadState, saveState } from './index'
 
 export function loadSoundEnabled(): boolean {
@@ -71,4 +79,92 @@ export function loadThemeOverride(): 'light' | 'dark' | null {
 
 export function saveThemeOverride(theme: 'light' | 'dark'): void {
   saveState({ ...loadState(), themeOverride: theme })
+}
+
+export function loadAppMode(): AppMode {
+  return loadState().appMode ?? 'recall'
+}
+
+export function saveAppMode(mode: AppMode): void {
+  saveState({ ...loadState(), appMode: mode })
+}
+
+export function loadRecognitionLeftHand(): boolean {
+  return loadState().recognitionLeftHand ?? false
+}
+
+export function saveRecognitionLeftHand(enabled: boolean): void {
+  saveState({ ...loadState(), recognitionLeftHand: enabled })
+}
+
+export function loadRecognitionFretCount(): number {
+  return loadState().recognitionFretCount ?? 12
+}
+
+export function saveRecognitionFretCount(fretCount: number): void {
+  saveState({ ...loadState(), recognitionFretCount: fretCount })
+}
+
+export function loadRecognitionLabelMode(): FretboardLabelMode {
+  return loadState().recognitionLabelMode ?? 'frets-strings'
+}
+
+export function saveRecognitionLabelMode(mode: FretboardLabelMode): void {
+  saveState({ ...loadState(), recognitionLabelMode: mode })
+}
+
+export function loadRecognitionNoteNameFormat(): NoteNameFormat {
+  return loadState().recognitionNoteNameFormat ?? 'both'
+}
+
+export function saveRecognitionNoteNameFormat(format: NoteNameFormat): void {
+  saveState({ ...loadState(), recognitionNoteNameFormat: format })
+}
+
+export function loadRecognitionShowFretMarkers(): boolean {
+  return loadState().recognitionShowFretMarkers ?? true
+}
+
+export function saveRecognitionShowFretMarkers(enabled: boolean): void {
+  saveState({ ...loadState(), recognitionShowFretMarkers: enabled })
+}
+
+export function loadRecognitionSelectedStrings(): StringName[] {
+  return loadState().recognitionSelectedStrings ?? [...STRING_NAMES]
+}
+
+export function saveRecognitionSelectedStrings(strings: StringName[]): void {
+  saveState({ ...loadState(), recognitionSelectedStrings: strings })
+}
+
+export function loadRecognitionNoteFilterEnabled(): boolean {
+  return loadState().recognitionNoteFilterEnabled ?? false
+}
+
+export function saveRecognitionNoteFilterEnabled(enabled: boolean): void {
+  saveState({ ...loadState(), recognitionNoteFilterEnabled: enabled })
+}
+
+export function loadRecognitionSelectedNotes(): NoteId[] {
+  return loadState().recognitionSelectedNotes ?? [...DEFAULT_NOTE_IDS]
+}
+
+export function saveRecognitionSelectedNotes(notes: NoteId[]): void {
+  saveState({ ...loadState(), recognitionSelectedNotes: notes })
+}
+
+export function loadRecognitionSoundEnabled(): boolean {
+  return loadState().recognitionSoundEnabled ?? true
+}
+
+export function saveRecognitionSoundEnabled(enabled: boolean): void {
+  saveState({ ...loadState(), recognitionSoundEnabled: enabled })
+}
+
+export function loadRecognitionFeedbackMessagesEnabled(): boolean {
+  return loadState().recognitionFeedbackMessagesEnabled ?? true
+}
+
+export function saveRecognitionFeedbackMessagesEnabled(enabled: boolean): void {
+  saveState({ ...loadState(), recognitionFeedbackMessagesEnabled: enabled })
 }

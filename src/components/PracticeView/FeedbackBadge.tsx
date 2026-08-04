@@ -4,9 +4,11 @@ export type Feedback = { kind: 'success' } | { kind: 'error'; playedLabel: strin
 
 interface FeedbackBadgeProps {
   feedback: Feedback
+  /** How the wrong note was produced — "played" (mic-detected) or "picked" (clicked). */
+  verb?: string
 }
 
-export function FeedbackBadge({ feedback }: FeedbackBadgeProps) {
+export function FeedbackBadge({ feedback, verb = 'played' }: FeedbackBadgeProps) {
   if (feedback.kind === 'success') {
     return (
       <div className={styles.feedbackBadge} data-kind="success" role="status">
@@ -17,7 +19,7 @@ export function FeedbackBadge({ feedback }: FeedbackBadgeProps) {
 
   return (
     <div className={styles.feedbackBadge} data-kind="error" role="status">
-      ✗ You played {feedback.playedLabel}
+      ✗ You {verb} {feedback.playedLabel}
     </div>
   )
 }

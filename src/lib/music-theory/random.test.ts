@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { listReachablePairs, pickRandomRound, pickWeightedRound } from './random'
-import { isNoteOnString } from './fretboard'
+import { listReachablePairs, pickRandomRound, pickRecognitionRound, pickWeightedRound } from './random'
+import { isNoteOnString, noteAtFret } from './fretboard'
 import { makeStatsKey } from './statsKey'
 import { ALL_NOTE_IDS, noteIdToPitchClass } from './pitchClass'
 import type { NoteId, PairWeights, StringName } from '../../types'
@@ -87,6 +87,54 @@ describe('pickRandomRound', () => {
     }
     const accidentalCount = counts['F#'] + counts.Gb
     expect(accidentalCount).toBeGreaterThan(counts.A * 1.5)
+  })
+})
+
+describe('pickRecognitionRound', () => {
+  it('never repeats the previous position\'s sound', () => {
+    let previousPitchClass: number | null = null
+    for (let i = 0; i < 500; i++) {
+      const pick = pickRecognitionRound(ALL_STRINGS, RANGE, null, previousPitchClass)
+      if (previousPitchClass !== null) expect(pick.pitchClass).not.toBe(previousPitchClass)
+      previousPitchClass = pick.pitchClass
+    }
+  })
+
+  it('always returns a fret within range whose pitch class matches the string/fret', () => {
+    for (let i = 0; i < 200; i++) {
+      const pick = pickRecognitionRound(ALL_STRINGS, RANGE, null, null)
+      expect(pick.fret).toBeGreaterThanOrEqual(RANGE.min)
+      expect(pick.fret).toBeLessThanOrEqual(RANGE.max)
+      expect(noteAtFret(pick.stringName, pick.fret)).toBe(pick.pitchClass)
+    }
+  })
+
+  it('only picks among the selected strings', () => {
+    const strings: StringName[] = ['E', 'A']
+    for (let i = 0; i < 200; i++) {
+      const pick = pickRecognitionRound(strings, RANGE, null, null)
+      expect(strings).toContain(pick.stringName)
+    }
+  })
+
+  it('respects an eligible-pitch-class filter', () => {
+    const eligible = [noteIdToPitchClass('C'), noteIdToPitchClass('G')]
+    for (let i = 0; i < 200; i++) {
+      const pick = pickRecognitionRound(ALL_STRINGS, RANGE, eligible, null)
+      expect(eligible).toContain(pick.pitchClass)
+    }
+  })
+
+  it('treats a null filter as unrestricted', () => {
+    const seen = new Set<number>()
+    for (let i = 0; i < 500; i++) {
+      seen.add(pickRecognitionRound(ALL_STRINGS, RANGE, null, null).pitchClass)
+    }
+    expect(seen.size).toBe(12)
+  })
+
+  it('throws when no eligible pitch class is reachable on any selected string within range', () => {
+    expect(() => pickRecognitionRound(['E'], { min: 0, max: 0 }, [noteIdToPitchClass('C#')], null)).toThrow()
   })
 })
 

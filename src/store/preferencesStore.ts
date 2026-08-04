@@ -1,6 +1,7 @@
 import { create } from 'zustand'
-import type { MicSensitivity } from '../types'
+import type { AppMode, MicSensitivity } from '../types'
 import {
+  loadAppMode,
   loadFeedbackMessagesEnabled,
   loadMergeAccidentalSpellingsEnabled,
   loadMetronomeBeatsPerNote,
@@ -8,8 +9,11 @@ import {
   loadMetronomeEnabled,
   loadMetronomeLockToTimer,
   loadMicSensitivity,
+  loadRecognitionFeedbackMessagesEnabled,
+  loadRecognitionSoundEnabled,
   loadSoundEnabled,
   loadThemeOverride,
+  saveAppMode,
   saveFeedbackMessagesEnabled,
   saveMergeAccidentalSpellingsEnabled,
   saveMetronomeBeatsPerNote,
@@ -17,6 +21,8 @@ import {
   saveMetronomeEnabled,
   saveMetronomeLockToTimer,
   saveMicSensitivity,
+  saveRecognitionFeedbackMessagesEnabled,
+  saveRecognitionSoundEnabled,
   saveSoundEnabled,
   saveThemeOverride,
 } from '../lib/storage/preferences'
@@ -33,6 +39,10 @@ interface PreferencesStore {
   metronomeBeatsPerNote: number
   /** null until the user manually toggles the theme; from then on this explicit choice wins over the system preference. */
   themeOverride: 'light' | 'dark' | null
+  /** Which top-level practice experience is active — Recall (text/mic) or Recognition (visual fretboard). */
+  appMode: AppMode
+  recognitionSoundEnabled: boolean
+  recognitionFeedbackMessagesEnabled: boolean
   setSoundEnabled: (enabled: boolean) => void
   setFeedbackMessagesEnabled: (enabled: boolean) => void
   setMicSensitivity: (sensitivity: MicSensitivity) => void
@@ -42,6 +52,9 @@ interface PreferencesStore {
   setMetronomeLockToTimer: (enabled: boolean) => void
   setMetronomeBeatsPerNote: (beats: number) => void
   setThemeOverride: (theme: 'light' | 'dark') => void
+  setAppMode: (mode: AppMode) => void
+  setRecognitionSoundEnabled: (enabled: boolean) => void
+  setRecognitionFeedbackMessagesEnabled: (enabled: boolean) => void
 }
 
 export const usePreferencesStore = create<PreferencesStore>((set) => ({
@@ -54,6 +67,9 @@ export const usePreferencesStore = create<PreferencesStore>((set) => ({
   metronomeLockToTimer: loadMetronomeLockToTimer(),
   metronomeBeatsPerNote: loadMetronomeBeatsPerNote(),
   themeOverride: loadThemeOverride(),
+  appMode: loadAppMode(),
+  recognitionSoundEnabled: loadRecognitionSoundEnabled(),
+  recognitionFeedbackMessagesEnabled: loadRecognitionFeedbackMessagesEnabled(),
 
   setSoundEnabled: (enabled) => {
     saveSoundEnabled(enabled)
@@ -98,5 +114,20 @@ export const usePreferencesStore = create<PreferencesStore>((set) => ({
   setThemeOverride: (theme) => {
     saveThemeOverride(theme)
     set({ themeOverride: theme })
+  },
+
+  setAppMode: (mode) => {
+    saveAppMode(mode)
+    set({ appMode: mode })
+  },
+
+  setRecognitionSoundEnabled: (enabled) => {
+    saveRecognitionSoundEnabled(enabled)
+    set({ recognitionSoundEnabled: enabled })
+  },
+
+  setRecognitionFeedbackMessagesEnabled: (enabled) => {
+    saveRecognitionFeedbackMessagesEnabled(enabled)
+    set({ recognitionFeedbackMessagesEnabled: enabled })
   },
 }))
