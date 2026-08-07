@@ -19,6 +19,7 @@ const VIEW_WIDTH = 1000
 const VIEW_HEIGHT = 320
 const TOP_PADDING = 16
 const RIGHT_PADDING = 16
+const DOT_RADIUS = 11
 
 /** High string on top, low string on bottom — matches FretboardHeatmap's existing row order. */
 const ROWS: readonly StringName[] = [...STRING_NAMES].reverse()
@@ -32,17 +33,19 @@ export function Fretboard({ fretCount, leftHand, labelMode, showMarkers, highlig
   const stringLabelWidth = showStringLabels ? 46 : 12
   // Tall enough that the highlighted dot on the bottom string can't reach up into the
   // fret number row below the board.
-  const fretLabelHeight = showFretLabels ? 46 : 8
+  // Without fret labels, reserve a full highlight radius above and below the outer strings.
+  // This keeps a low-E/high-e highlight inside the SVG rather than clipping its edge.
+  const boardVerticalPadding = showFretLabels ? TOP_PADDING : DOT_RADIUS + 6
+  const fretLabelHeight = showFretLabels ? 46 : boardVerticalPadding
 
   // String labels sit next to the nut, which moves sides in left-hand mode — so the wider
   // margin needs to follow the nut rather than always sitting on the left.
   const boardLeft = leftHand ? RIGHT_PADDING : stringLabelWidth
   const boardRight = VIEW_WIDTH - (leftHand ? stringLabelWidth : RIGHT_PADDING)
-  const boardTop = TOP_PADDING
+  const boardTop = boardVerticalPadding
   const boardBottom = VIEW_HEIGHT - fretLabelHeight
   const boardWidth = boardRight - boardLeft
   const stringGap = (boardBottom - boardTop) / (ROWS.length - 1)
-  const dotRadius = 11
 
   /** Real scale-length taper: fret spacing narrows toward the body, all within a fixed board width. */
   function rawFretOffset(fret: number): number {
@@ -151,7 +154,7 @@ export function Fretboard({ fretCount, leftHand, labelMode, showMarkers, highlig
           </text>
         ))}
 
-      {highlightPos && <circle className={styles.highlight} cx={highlightPos.x} cy={highlightPos.y} r={dotRadius} />}
+      {highlightPos && <circle className={styles.highlight} cx={highlightPos.x} cy={highlightPos.y} r={DOT_RADIUS} />}
     </svg>
   )
 }

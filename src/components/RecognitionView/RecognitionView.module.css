@@ -135,15 +135,18 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   transition:
     border-color 150ms ease,
     background 150ms ease,
     transform 150ms ease;
 }
 
-.answerButton:hover:not(:disabled) {
-  border-color: var(--accent);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .answerButton:hover:not(:disabled) {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
 }
 
 .answerButton:disabled {

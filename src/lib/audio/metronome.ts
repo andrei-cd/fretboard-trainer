@@ -1,4 +1,4 @@
-import { getAudioContext } from './audioContext'
+import { getAudioContext, resumeAudioContext } from './audioContext'
 
 /** How far ahead (in seconds) clicks are scheduled into the Web Audio timeline. */
 const SCHEDULE_AHEAD_SEC = 0.1
@@ -41,6 +41,7 @@ export function startMetronome({ bpm, accentEvery, onTick }: MetronomeOptions): 
   let nextBeatTime = ctx.currentTime
   let beatIndex = 0
   let stopped = false
+  let timer: ReturnType<typeof setTimeout> | null = null
 
   function scheduleAhead() {
     if (stopped) return
@@ -58,12 +59,22 @@ export function startMetronome({ bpm, accentEvery, onTick }: MetronomeOptions): 
     timer = setTimeout(scheduleAhead, LOOKAHEAD_MS)
   }
 
-  let timer = setTimeout(scheduleAhead, 0)
+  // A suspended context reports a frozen clock. Wait for it to be running before scheduling,
+  // otherwise every future click can be queued at the same stale timestamp after a pause.
+  void resumeAudioContext(ctx)
+    .then(() => {
+      if (stopped) return
+      nextBeatTime = ctx.currentTime
+      scheduleAhead()
+    })
+    .catch(() => {
+      // Browsers may deny resume before any user gesture; a later toggle will retry it.
+    })
 
   return {
     stop: () => {
       stopped = true
-      clearTimeout(timer)
+      if (timer !== null) clearTimeout(timer)
     },
   }
 }

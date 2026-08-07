@@ -1,5 +1,7 @@
 import { useSessionStore } from '../../store/sessionStore'
 import { usePreferencesStore } from '../../store/preferencesStore'
+import { resumeAudioContext } from '../../lib/audio/audioContext'
+import { NumericInput } from '../NumericInput'
 import styles from './SettingsPanel.module.css'
 
 export function MetronomeSettings() {
@@ -23,7 +25,10 @@ export function MetronomeSettings() {
         <input
           type="checkbox"
           checked={metronomeEnabled}
-          onChange={(e) => setMetronomeEnabled(e.target.checked)}
+          onChange={(e) => {
+            if (e.target.checked) void resumeAudioContext()
+            setMetronomeEnabled(e.target.checked)
+          }}
         />
         Enable metronome
       </label>
@@ -32,15 +37,11 @@ export function MetronomeSettings() {
           {!lockActive && (
             <label className={styles.timerRow}>
               BPM
-              <input
-                type="number"
+              <NumericInput
+                value={metronomeBpm}
                 min={20}
                 max={300}
-                value={metronomeBpm}
-                onChange={(e) => {
-                  const value = Number(e.target.value)
-                  if (Number.isFinite(value) && value > 0) setMetronomeBpm(value)
-                }}
+                onValueChange={setMetronomeBpm}
               />
             </label>
           )}
@@ -57,15 +58,11 @@ export function MetronomeSettings() {
               {lockActive && (
                 <label className={styles.timerRow}>
                   Beats per note
-                  <input
-                    type="number"
-                    min={1}
-                    max={16}
-                    value={metronomeBeatsPerNote}
-                    onChange={(e) => {
-                      const value = Number(e.target.value)
-                      if (Number.isFinite(value) && value > 0) setMetronomeBeatsPerNote(value)
-                    }}
+                <NumericInput
+                  value={metronomeBeatsPerNote}
+                  min={1}
+                  max={16}
+                  onValueChange={setMetronomeBeatsPerNote}
                   />
                 </label>
               )}

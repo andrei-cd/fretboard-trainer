@@ -1,4 +1,5 @@
 import { useSessionStore } from '../../store/sessionStore'
+import { NumericInput } from '../NumericInput'
 import styles from './SettingsPanel.module.css'
 
 export function TimerConfig() {
@@ -13,15 +14,11 @@ export function TimerConfig() {
       <legend className={styles.srOnly}>Countdown</legend>
       <label className={styles.timerRow}>
         Seconds per note
-        <input
-          type="number"
+        <NumericInput
+          value={timerSeconds}
           min={1}
           max={60}
-          value={timerSeconds}
-          onChange={(e) => {
-            const value = Number(e.target.value)
-            if (Number.isFinite(value) && value > 0) setConfig({ timerSeconds: value })
-          }}
+          onValueChange={(value) => setConfig({ timerSeconds: value })}
         />
       </label>
     </fieldset>

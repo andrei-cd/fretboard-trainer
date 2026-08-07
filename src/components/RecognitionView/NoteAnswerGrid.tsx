@@ -48,7 +48,8 @@ function AnswerRow({
 
 export function NoteAnswerGrid({ format, disabled, incorrectAnswers, onAnswer }: NoteAnswerGridProps) {
   const sharpCells = NATURAL_NOTE_IDS.map((natural) => NATURAL_TO_ACCIDENTAL_PAIR.get(natural)?.[0] ?? null)
-  const flatCells = NATURAL_NOTE_IDS.map((natural) => NATURAL_TO_ACCIDENTAL_PAIR.get(natural)?.[1] ?? null)
+  // Flats sit below the natural letter they modify: Db under D, Gb under G, and so on.
+  const flatCells: (NoteId | null)[] = [null, 'Db', 'Eb', null, 'Gb', 'Ab', 'Bb']
 
   return (
     <div className={styles.answerGrid} role="group" aria-label="Note names">

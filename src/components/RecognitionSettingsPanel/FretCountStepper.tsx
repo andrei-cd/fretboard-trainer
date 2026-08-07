@@ -1,5 +1,6 @@
 import { useRecognitionStore } from '../../store/recognitionStore'
 import panelStyles from '../SettingsPanel/SettingsPanel.module.css'
+import { NumericInput } from '../NumericInput'
 
 export function FretCountStepper() {
   const fretCount = useRecognitionStore((s) => s.config.fretCount)
@@ -10,15 +11,11 @@ export function FretCountStepper() {
       <legend className={panelStyles.srOnly}>Fret Positions</legend>
       <label className={panelStyles.timerRow}>
         Frets shown
-        <input
-          type="number"
+        <NumericInput
+          value={fretCount}
           min={1}
           max={24}
-          value={fretCount}
-          onChange={(e) => {
-            const value = Number(e.target.value)
-            if (Number.isFinite(value) && value >= 1 && value <= 24) setConfig({ fretCount: value })
-          }}
+          onValueChange={(value) => setConfig({ fretCount: value })}
         />
       </label>
     </fieldset>
